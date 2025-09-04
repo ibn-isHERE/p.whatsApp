@@ -1,0 +1,13 @@
+# Dependencies
+/node_modules
+
+# WhatsApp-Web.js session files (SENSITIF!)
+.wwebjs_auth/
+.wwebjs_cache/
+
+# User uploaded content
+/uploads/
+/media/
+
+# Environment variables file (jika ada)
+.env

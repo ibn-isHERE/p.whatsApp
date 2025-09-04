@@ -1,0 +1,845 @@
+/* ---- Base Styles & Layout ---- */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif; /* A slightly more modern font */
+    background-color: #f8f9fa; /* Lighter background for a cleaner look */
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    color: #333; /* Default text color */
+}
+
+main {
+    flex: 1;
+    padding-top: 80px; /* Space for fixed navbar */
+    display: flex;
+    flex-direction: column;
+}
+
+.app-header {
+    text-align: center;
+    margin-top: 30px; /* More space above the main title */
+    margin-bottom: 30px;
+}
+
+.app-header h1 {
+    font-size: 2.5rem; /* Slightly larger title */
+    font-weight: 700;
+    color: #003366; /* Matching navbar color for prominence */
+    letter-spacing: -0.5px; /* Tighter letter spacing */
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    gap: 25px; /* Increased gap between columns */
+    width: 90%;
+    margin: 0 auto 40px auto; /* Centered content */
+    padding: 0 25px; /* Padding on sides for smaller screens */
+    box-sizing: border-box;
+    align-items: flex-start; /* Align items to the start of the cross axis */
+}
+
+/* ---- Navbar Styles ---- */
+.navbar {
+    background-color: #003366;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px; /* Taller navbar */
+    z-index: 1000; /* Higher z-index to ensure it stays on top */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* More prominent shadow */
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-left img {
+    width: 90px; /* Slightly larger logo */
+    height: 70px;
+    margin-right: 15px;
+    margin-left: 50px; /* Adjusted margin for better centering */
+}
+
+.navbar-text {
+    color: white;
+    font-size: 24px; /* Larger text */
+    font-weight: 700; /* Bolder text */
+    white-space: nowrap;
+    font-style: italic;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* Subtle text shadow */
+}
+
+/* ---- Form Container (Left Column) ---- */
+.form-container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px; /* More rounded corners */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Softer, larger shadow */
+    flex-shrink: 0;
+    flex-basis: 450px;
+    flex-grow: 0;
+    height: auto;
+    position: sticky;
+    top: 100px; /* Adjusted sticky position below navbar */
+    max-height: calc(100vh - 120px); /* Account for top/bottom margins */
+    overflow-y: auto;
+    box-sizing: border-box;
+    border: 1px solid #e0e0e0; /* Subtle border */
+}
+
+.form-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: #003366;
+    font-size: 1.8rem;
+}
+
+/* Tambahan CSS untuk tab button di form container */
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #e9ecef; /* Garis abu-abu tipis di bawah semua tab */
+}
+
+
+.tab-button {
+    background-color: transparent;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #6c757d; 
+    transition: color 0.3s ease;
+    border-bottom: 2px solid transparent; 
+}
+
+.tab-button:hover {
+    color: #495057; 
+}
+
+.tab-button.active {
+    color: #007bff; 
+    border-bottom-color: #007bff; 
+}
+
+.form-content {
+    display: none;
+}
+
+.form-content.active {
+    display: block;
+}
+
+form label {
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 5px; /* Closer to the input */
+    font-weight: 600;
+    color: #444;
+    user-select: none;
+}
+
+form input[type="text"],
+form input[type="datetime-local"],
+form textarea,
+form select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #dcdcdc; /* Lighter border */
+    border-radius: 10px; /* More rounded inputs */
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+    resize: vertical;
+    min-height: 40px; /* Minimum height for inputs */
+    background-color: white;
+}
+
+form input[type="text"]:focus,
+form input[type="datetime-local"]:focus,
+form textarea:focus,
+form select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Focus ring effect */
+}
+
+textarea {
+    min-height: 100px; /* Standard textarea height */
+}
+
+.select-all-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #444;
+}
+
+.select-all-container label {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#contactSearch {
+    margin-bottom: 10px;
+    margin-top: 8px; /* Adjusted margin */
+}
+
+.contact-checklist-box {
+    max-height: 200px; /* Slightly taller contact list */
+    overflow-y: auto;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin-top: 10px;
+    background-color: #ffffff; /* White background for list */
+    box-sizing: border-box;
+}
+
+.contact-checklist-box label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-size: 0.95rem; /* Slightly larger font */
+    color: #333;
+    transition: background-color 0.2s ease;
+    padding: 8px 10px; /* More padding */
+    border-radius: 8px; /* More rounded labels */
+    user-select: none;
+}
+
+.contact-checklist-box label:last-child {
+    margin-bottom: 0;
+}
+
+.contact-checklist-box label:hover {
+    background-color: #e6f7ff; /* Lighter blue on hover */
+}
+
+.contact-checklist-box input[type="checkbox"],
+.select-all-container input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px; /* Larger checkbox */
+    height: 20px;
+    border: 2px solid #007bff;
+    border-radius: 6px; /* More rounded checkbox */
+    margin-right: 15px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.contact-checklist-box input[type="checkbox"]:checked,
+.select-all-container input[type="checkbox"]:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+    transform: scale(1.05); /* Slight scale animation on check */
+}
+
+.contact-checklist-box input[type="checkbox"]:checked::after,
+.select-all-container input[type="checkbox"]:checked::after {
+    content: "✔";
+    color: white;
+    position: absolute;
+    top: -1px; /* Adjust checkmark position */
+    left: 0;
+    font-size: 14px; /* Adjust checkmark size */
+    font-weight: bold;
+    user-select: none;
+    text-align: center;
+    width: 100%;
+    line-height: 20px; /* Align checkmark vertically */
+}
+
+.file-upload-section {
+    margin-top: 20px;
+}
+
+.file-upload-container {
+    margin-top: 10px;
+    border: 2px dashed #a0a0a0; /* Darker dashed border */
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.file-upload-container:hover {
+    background-color: #f5f5f5;
+    border-color: #007bff;
+}
+
+.file-upload-container input[type="file"] {
+    display: none;
+}
+
+.file-upload-label {
+    display: block;
+    padding: 5px 0;
+    cursor: pointer;
+    color: #007bff;
+    font-weight: 600;
+}
+
+.file-name {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 8px;
+    word-break: break-all; /* Ensure long file names wrap */
+}
+
+/* --- Tambahan CSS untuk Checkbox "Pertahankan file lama" --- */
+#keepFileCheckboxDiv {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    font-weight: 600;
+    color: #444;
+}
+
+#keepFileCheckboxDiv label {
+    margin: 0;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+}
+
+#keepFileCheckboxDiv input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #007bff;
+    border-radius: 6px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+#keepFileCheckboxDiv input[type="checkbox"]:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+    transform: scale(1.05);
+}
+
+#keepFileCheckboxDiv input[type="checkbox"]:checked::after {
+    content: "✔";
+    color: white;
+    position: absolute;
+    top: -1px;
+    left: 0;
+    font-size: 14px;
+    font-weight: bold;
+    user-select: none;
+    text-align: center;
+    width: 100%;
+    line-height: 20px;
+}
+/* --- Akhir Tambahan CSS --- */
+
+form button {
+    background-color: #007bff; 
+    color: white;
+    border: none;
+    margin-top: 30px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    width: 100%;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+}
+
+form button:hover {
+    background-color: #05529f;
+    transform: translateY(-2px); /* Slight lift on hover */
+    box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
+}
+
+/* ---- Schedule Container (Right Column) ---- */
+.schedule-container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    border: 1px solid #e0e0e0;
+}
+
+.schedule-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 700;
+    color: #003366;
+    font-size: 1.8rem;
+}
+
+/* --- Filter Buttons --- */
+.filter-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px; /* Slightly more space between buttons */
+    margin-bottom: 25px; /* Space below filters */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.filter-button {
+    background-color: #e9ecef; /* Lighter grey for inactive */
+    border: 1px solid #ced4da; /* Subtle border */
+    padding: 10px 20px; /* More padding */
+    border-radius: 8px; /* More rounded */
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    flex-grow: 1; /* Allow buttons to grow */
+    max-width: 150px; /* Max width for individual buttons */
+    text-align: center;
+}
+
+.filter-button:hover {
+    background-color: #dee2e6; /* Darker grey on hover */
+    transform: translateY(-1px);
+}
+
+.filter-button.active {
+    background-color: #007bff; /* Primary blue for active */
+    color: white;
+    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2); /* Subtle shadow for active */
+    transform: translateY(-2px);
+}
+
+/* Pembungkus tabel yang bisa digulir */
+.table-wrapper {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    margin-top: 0; /* No top margin as filters are above */
+    width: 100%;
+    border-radius: 10px; /* Rounded corners for the scrollable area */
+    border: 1px solid #e0e0e0; /* Border for the table wrapper */
+}
+
+/* ---- Table Styles ---- */
+#scheduleTable {
+    width: 100%;
+    min-width: 1000px;
+    border-collapse: separate; /* Use separate to allow border-radius on cells */
+    border-spacing: 0; /* Remove default spacing */
+}
+
+#scheduleTable thead {
+    position: sticky;
+    top: 0;
+    background-color: #f1f3f5; /* Slightly darker header background */
+    z-index: 1;
+}
+
+#scheduleTable th,
+#scheduleTable td {
+    border-bottom: 1px solid #e9ecef; /* Only bottom border */
+    padding: 15px 12px; /* More padding */
+    text-align: left;
+    font-size: 0.95rem;
+    vertical-align: middle; /* Align text vertically in middle */
+    word-wrap: break-word;
+}
+
+#scheduleTable th {
+    background-color: #e9ecef;
+    font-weight: 700; /* Bolder headers */
+    color: #495057;
+    text-transform: uppercase; /* Uppercase headers */
+    letter-spacing: 0.5px;
+    /* Add border-radius to top corners of first and last th */
+}
+
+#scheduleTable th:first-child {
+    border-top-left-radius: 10px;
+}
+
+#scheduleTable th:last-child {
+    border-top-right-radius: 10px;
+}
+
+#scheduleTable tbody tr:last-child td {
+    border-bottom: none; /* No bottom border for last row */
+}
+
+/* Atur lebar kolom tabel (adjust as needed) */
+#scheduleTable th:nth-child(1), #scheduleTable td:nth-child(1) { width: 130px; min-width: 130px; } /* Waktu */
+#scheduleTable th:nth-child(2), #scheduleTable td:nth-child(2) { width: 160px; min-width: 160px; } /* Nomor Tujuan */
+#scheduleTable th:nth-child(3), #scheduleTable td:nth-child(3) { width: auto; min-width: 250px; white-space: normal; } /* Pesan */
+#scheduleTable th:nth-child(4), #scheduleTable td:nth-child(4) { width: 90px; min-width: 90px; text-align: center;} /* File */
+#scheduleTable th:nth-child(5), #scheduleTable td:nth-child(5) { width: 100px; min-width: 100px; text-align: center; } /* Status */
+#scheduleTable th:nth-child(6), #scheduleTable td:nth-child(6) { text-align: center; vertical-align: middle !important;}
+#scheduleTable td.action-buttons {
+    text-align: center;
+    vertical-align: middle !important;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+
+/* ---- Table Status & Actions ---- */
+.status-terkirim { color: #28a745; font-weight: bold; } /* Green */
+.status-selesai { color: #17a2b8; font-weight: bold; } /* Teal/Info */
+.status-gagal { color: #dc3545; font-weight: bold; } /* Red */
+.status-terjadwal { color: #ffc107; font-weight: bold; } /* Orange/Yellow */
+.status-dibatalkan { color: #6c757d; font-weight: bold; } /* Grey */
+
+.material-icons {
+    vertical-align: middle;
+    margin-right: 3px;
+    font-size: 18px; /* Standard icon size */
+}
+
+/* --- TAMBAHAN: Paksa tombol tertentu ke baris baru (Efek <br>) --- */
+.action-buttons .finish-meeting-btn,
+.action-buttons .delete-meeting-btn,
+.action-buttons .delete-history-btn {
+    flex-basis: 100%; /* Paksa elemen ini untuk mengambil lebar penuh dari wadahnya */
+    margin-top: 8px; /* Opsional: Beri sedikit jarak atas dari baris sebelumnya */
+}
+
+.action-buttons button {
+    min-width: 0;
+    padding: 10px 15px; /* More padding for buttons */
+    cursor: pointer;
+    border-radius: 6px; /* Slightly more rounded buttons */
+    font-size: 0.85rem; /* Slightly smaller font for compactness */
+    font-weight: 600;
+    border: none;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.edit-btn {
+    background-color: #007bff; /* Primary blue */
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+}
+.edit-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.cancel-btn,
+.delete-history-btn {
+    background-color: #dc3545; /* Red for danger */
+    color: white;
+    box-shadow: 0 2px 5px rgba(220, 53, 69, 0.2);
+}
+.cancel-btn:hover,
+.delete-history-btn:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* --- AWAL PENAMBAHAN CSS UNTUK TOMBOL RAPAT --- */
+.cancel-meeting-btn {
+    background-color: #ffc107; /* Orange/Yellow for warning/cancel */
+    color: #212529; /* Dark text for better contrast */
+    box-shadow: 0 2px 5px rgba(255, 193, 7, 0.2);
+}
+.cancel-meeting-btn:hover {
+    background-color: #e0a800;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+}
+
+.finish-meeting-btn {
+    background-color: #28a745; /* Green for success/finish */
+    color: white;
+    box-shadow: 0 2px 5px rgba(40, 167, 69, 0.2);
+}
+.finish-meeting-btn:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.delete-meeting-btn {
+    background-color: #6c757d; /* Grey for delete history */
+    color: white;
+    box-shadow: 0 2px 5px rgba(108, 117, 125, 0.2);
+}
+.delete-meeting-btn:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+}
+/* --- AKHIR PENAMBAHAN CSS --- */
+
+
+/* ---- Footer ---- */
+footer {
+    background-color: #003366;
+    color: white;
+    text-align: center;
+    padding: 20px 20px; /* More padding */
+    margin-top: auto;
+    font-size: 0.9rem;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ======================================= */
+/* ===== CSS UNTUK MANAJEMEN KONTAK ===== */
+/* ======================================= */
+
+/* Memberi gaya pada form tambah/edit dan import di tab kontak */
+#contact-crud-form,
+#import-form {
+    background-color: #f0f4f8; /* Warna latar sedikit berbeda untuk memisahkan bagian */
+    border: 1px solid #dcdcdc;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 2.5em; /* Jarak antar form */
+}
+
+/* Memberi gaya pada judul di dalam form (Tambah/Edit dan Import) */
+#contact-crud-form h3,
+#import-form h3 {
+    margin-top: 0;
+    font-size: 1.4rem;
+    color: #003366;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 12px;
+    margin-bottom: 25px;
+}
+
+/* Tabel untuk daftar kontak */
+#contact-management-table {
+    width: 100%;
+    border-collapse: separate; /* Gunakan separate agar border-radius berfungsi */
+    border-spacing: 0;
+    margin-top: 1em;
+    font-size: 1rem;
+}
+
+/* Header dan sel pada tabel */
+#contact-management-table th,
+#contact-management-table td {
+    padding: 14px 18px; /* Padding lebih besar untuk kenyamanan membaca */
+    border-bottom: 1px solid #e0e0e0;
+    text-align: left;
+    vertical-align: middle;
+}
+
+/* Baris terakhir tidak perlu garis bawah */
+#contact-management-table tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* Header tabel (Nama, Nomor, Aksi) */
+#contact-management-table th {
+    background-color: #e9ecef;
+    font-weight: 700;
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Efek "Zebra" pada baris tabel agar mudah dibaca */
+#contact-management-table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+/* Efek hover saat mouse di atas baris tabel */
+#contact-management-table tbody tr:hover {
+    background-color: #e6f7ff; /* Warna biru muda saat di-hover */
+}
+
+/* Penataan untuk kolom Aksi agar tombolnya rapi */
+#contact-management-table td.action-buttons {
+    width: 130px; /* Memberi lebar tetap agar tombol tidak berantakan */
+    text-align: center;
+}
+
+/* Tombol Aksi di dalam tabel (Edit & Hapus) */
+#contact-management-table .action-buttons .edit-btn,
+#contact-management-table .action-buttons .cancel-btn {
+    /* Menggunakan gaya tombol yang sudah ada, hanya menyesuaikan ukuran */
+    padding: 6px 12px;
+    margin: 0 4px;
+    font-size: 0.85rem;
+}
+
+/* ---- Responsive Design ---- */
+@media (max-width: 1024px) {
+    .main-content {
+        flex-direction: column;
+        padding: 15px;
+        gap: 30px; /* Increased gap in column layout */
+        max-width: 90%; /* Adjust max-width for tablets */
+    }
+    .form-container,
+    .schedule-container {
+        width: 100%;
+        position: static;
+        max-height: none;
+        overflow-y: visible;
+        flex-basis: auto;
+        padding: 25px; /* Slightly less padding */
+    }
+    .table-wrapper {
+        max-height: 60vh; /* Allow table to take more height */
+    }
+    .navbar-left img {
+        margin-left: 20px; /* Adjust for smaller screens */
+        width: 70px;
+        height: 50px;
+    }
+    .navbar-text {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-header h1 {
+        font-size: 2rem;
+    }
+    .navbar {
+        height: 60px;
+        padding: 8px 15px;
+    }
+    .navbar-left img {
+        margin-left: 10px;
+        width: 60px;
+        height: 45px;
+    }
+    .navbar-text {
+        font-size: 18px;
+    }
+    .form-container h2,
+    .schedule-container h2 {
+        font-size: 1.6rem;
+    }
+    .filter-buttons {
+        gap: 8px; /* Reduce gap for smaller screens */
+        justify-content: space-around; /* Distribute buttons evenly */
+    }
+    .filter-button {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        max-width: 120px;
+    }
+    #scheduleTable th,
+    #scheduleTable td {
+        padding: 10px 8px; /* Reduce table padding */
+        font-size: 0.85rem;
+    }
+    .action-buttons {
+        flex-direction: column; /* Stack buttons vertically on smaller screens */
+        align-items: stretch;
+    }
+    .action-buttons button {
+        width: 100%; /* Make buttons take full width of the cell */
+        padding: 8px 10px;
+        font-size: 0.75rem;
+        gap: 3px;
+    }
+    .material-icons {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        height: 50px;
+    }
+    .navbar-left img {
+        margin-left: 5px;
+        width: 50px;
+        height: 35px;
+        margin-right: 8px;
+    }
+    .navbar-text {
+        font-size: 16px;
+        text-align: right; /* Allow text to be closer to logo */
+    }
+    .app-header h1 {
+        font-size: 1.8rem;
+    }
+    .main-content {
+        padding: 10px;
+        gap: 20px;
+    }
+    .form-container,
+    .schedule-container {
+        padding: 20px;
+    }
+    form input, form textarea, form button {
+        font-size: 0.9rem;
+        padding: 10px 12px;
+    }
+    .contact-checklist-box label {
+        font-size: 0.85rem;
+        padding: 6px 8px;
+    }
+    .contact-checklist-box input[type="checkbox"], .select-all-container input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+    }
+    .contact-checklist-box input[type="checkbox"]:checked::after, .select-all-container input[type="checkbox"]:checked::after {
+        font-size: 12px;
+        line-height: 16px;
+    }
+    .file-upload-container {
+        padding: 12px;
+    }
+    .file-upload-label {
+        font-size: 0.9em;
+    }
+    .filter-buttons {
+        flex-direction: column; /* Stack filter buttons vertically */
+        align-items: stretch; /* Stretch to full width */
+        gap: 10px;
+    }
+    .filter-button {
+        max-width: none; /* Remove max-width when stacked */
+        font-size: 1rem;
+    }
+    .table-wrapper {
+        min-width: unset; /* Allow table to shrink on very small screens */
+        overflow-x: scroll; /* Keep horizontal scroll */
+    }
+    #scheduleTable {
+        min-width: 600px; /* Minimum width for table on small screens */
+    }
+}
