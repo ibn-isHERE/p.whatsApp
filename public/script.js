@@ -42,7 +42,7 @@ function showForm(formId) {
 
         // Tampilkan area chat utama
         if (chatMainContainer) {
-            chatMainContainer.style.display = "block";
+            chatMainContainer.style.display = "flex";
         }
 
         // Load chat data
