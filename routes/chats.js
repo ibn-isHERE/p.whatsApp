@@ -1,7 +1,13 @@
 const express = require('express');
+const multer = require('multer'); // Pastikan multer di-import
+const path = require('path');
+const fs = require('fs');
+const { MessageMedia } = require('whatsapp-web.js'); // Import MessageMedia
+
 
 function createChatsRouter(db, whatsappClient, io) {
     const router = express.Router();
+    
 
     // Endpoint untuk mendapatkan daftar percakapan unik dengan info kontak
     router.get('/conversations', (req, res) => {
