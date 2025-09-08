@@ -7,10 +7,10 @@
     background: #ff4444;
     color: white;
     border-radius: 50%;
-    padding: 2px 6px;
-    font-size: 12px;
-    min-width: 18px;
-    height: 18px;
+    padding: 1.4px 4.2px; /* 2px 6px * 0.7 */
+    font-size: 8.4px; /* 12 * 0.7 */
+    min-width: 12.6px; /* 18 * 0.7 */
+    height: 12.6px; /* 18 * 0.7 */
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -31,10 +31,10 @@
     /* FIXED: Gunakan tinggi yang lebih tepat dan pastikan tidak overflow */
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 180px); /* Sesuaikan dengan navbar + header + margin */
-    max-height: calc(100vh - 180px); /* Pastikan tidak melebihi viewport */
+    height: calc(100vh - 126px); /* 180 * 0.7 = 126 */
+    max-height: calc(100vh - 126px);
     background-color: #f4f7f9;
-    border-radius: 8px;
+    border-radius: 5.6px; /* 8 *0.7 */
     overflow: hidden; /* Penting: cegah overflow keluar */
     padding: 0;
     position: relative; /* Untuk memastikan positioning yang benar */
@@ -46,7 +46,7 @@
     flex: 1; /* Ambil sisa ruang yang tersedia */
     min-height: 0; /* PENTING: Izinkan flex item menyusut */
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 5.6px;
     overflow: hidden;
     background: white;
 }
@@ -55,7 +55,7 @@
 /* === SIDEBAR DAFTAR PERCAKAPAN === */
 /* ========================================================== */
 #chatView .chat-sidebar {
-    width: 320px;
+    width: 224px; /* 320 *0.7 */
     flex-shrink: 0;
     border-right: 1px solid #eee;
     background: #f8f9fa;
@@ -68,7 +68,7 @@
 .chat-search {
     position: relative;
     display: flex;
-    padding: 15px;
+    padding: 10.5px; /* 15 *0.7 */
     border-bottom: 1px solid #ddd;
     flex-shrink: 0; /* Jangan biarkan area search mengecil */
     background-color: white;
@@ -76,17 +76,17 @@
 
 .chat-search input {
     width: 100%;
-    padding: 10px 40px 10px 15px;
+    padding: 7px 28px 7px 10.5px; /* 10px 40px 10px 15px -> *0.7 */
     border: 1px solid #ddd;
-    border-radius: 25px;
-    font-size: 14px;
+    border-radius: 17.5px; /* 25 *0.7 */
+    font-size: 9.8px; /* 14 *0.7 */
     outline: none;
 }
 
 .chat-search i {
     display: flex;
     position: absolute;
-    right: 30px;
+    right: 21px; /* 30 *0.7 */
     top: 50%;
     transform: translateY(-50%);
     color: #666;
@@ -105,7 +105,7 @@
 
 /* Item di Daftar Percakapan */
 .chat-item {
-    padding: 15px;
+    padding: 10.5px; /* 15 *0.7 */
     border-bottom: 1px solid #eee;
     cursor: pointer;
     transition: background-color 0.2s;
@@ -124,7 +124,7 @@
 
 .chat-item.unread {
     background: #e7f3ff;
-    border-left: 3px solid #007bff;
+    border-left: 2.1px solid #007bff; /* 3 *0.7 */
 }
 
 .chat-item.active.unread {
@@ -135,16 +135,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 5px;
+    margin-bottom: 3.5px; /* 5 *0.7 */
 }
 
 .chat-contact-name {
     font-weight: 600;
-    font-size: 14px;
+    font-size: 9.8px; /* 14 *0.7 */
 }
 
 .chat-time {
-    font-size: 12px;
+    font-size: 8.4px; /* 12 *0.7 */
     color: #666;
 }
 
@@ -153,7 +153,7 @@
 }
 
 .chat-preview {
-    font-size: 13px;
+    font-size: 9.1px; /* 13 *0.7 */
     color: #666;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -168,14 +168,14 @@
     background: #28a745;
     color: white;
     border-radius: 50%;
-    padding: 2px 6px;
-    font-size: 11px;
-    min-width: 18px;
-    height: 18px;
+    padding: 1.4px 4.2px; /* 2px 6px *0.7 */
+    font-size: 7.7px; /* 11 *0.7 */
+    min-width: 12.6px; /* 18 *0.7 */
+    height: 12.6px; /* 18 *0.7 */
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-left: 5px;
+    margin-left: 3.5px; /* 5 *0.7 */
 }
 
 /* ========================================================== */
@@ -191,7 +191,7 @@
 }
 
 .chat-header {
-    padding: 15px 20px;
+    padding: 10.5px 14px; /* 15px 20px *0.7 */
     border-bottom: 1px solid #ddd;
     background: #007bff;
     color: white;
@@ -203,21 +203,21 @@
 
 .chat-header .chat-info h3 {
     margin: 0;
-    font-size: 16px;
+    font-size: 11.2px; /* 16 *0.7 */
     color: white;
 }
 
 .chat-header .chat-info span {
-    font-size: 14px;
+    font-size: 9.8px; /* 14 *0.7 */
     color: rgba(255, 255, 255, 0.8);
 }
 
 .chat-actions button {
     background: none;
     border: none;
-    padding: 8px;
+    padding: 5.6px; /* 8 *0.7 */
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 2.8px; /* 4 *0.7 */
     color: white;
     transition: background-color 0.2s;
 }
@@ -230,7 +230,7 @@
 .chat-messages {
     flex: 1; /* Ambil sisa ruang vertikal */
     min-height: 0; /* PENTING: Izinkan flex item menyusut */
-    padding: 20px;
+    padding: 14px; /* 20 *0.7 */
     overflow-y: auto; /* Scroll vertikal hanya di sini */
     overflow-x: hidden; /* Cegah scroll horizontal */
     background: #e5ddd5;
@@ -249,13 +249,13 @@
 }
 
 .no-chat-selected i {
-    font-size: 48px;
-    margin-bottom: 15px;
+    font-size: 33.6px; /* 48 *0.7 */
+    margin-bottom: 10.5px; /* 15 *0.7 */
 }
 
 /* Gelembung Pesan (Bubbles) */
 .message {
-    margin-bottom: 15px;
+    margin-bottom: 10.5px; /* 15 *0.7 */
     display: flex;
     flex-shrink: 0; /* Jangan biarkan pesan mengecil */
 }
@@ -270,28 +270,28 @@
 
 .message-bubble {
     max-width: 70%;
-    padding: 10px 15px;
-    border-radius: 18px;
+    padding: 7px 10.5px; /* 10px 15px *0.7 */
+    border-radius: 12.6px; /* 18 *0.7 */
     position: relative;
     word-wrap: break-word;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 0.7px 0.7px rgba(0, 0, 0, 0.08);
 }
 
 .message.incoming .message-bubble {
     background: white;
-    border-bottom-left-radius: 4px;
+    border-bottom-left-radius: 2.8px; /* 4 *0.7 */
 }
 
 .message.outgoing .message-bubble {
     background: #dcf8c6;
     color: #333;
-    border-bottom-right-radius: 4px;
+    border-bottom-right-radius: 2.8px; /* 4 *0.7 */
 }
 
 .message-time {
-    font-size: 11px;
+    font-size: 7.7px; /* 11 *0.7 */
     color: #999;
-    margin-top: 5px;
+    margin-top: 3.5px; /* 5 *0.7 */
     text-align: right;
 }
 
@@ -306,7 +306,7 @@
 
 /* FIXED: Area Input Balasan dengan posisi tetap di bawah */
 .chat-input-area {
-    padding: 15px 20px;
+    padding: 10.5px 14px; /* 15px 20px *0.7 */
     border-top: 1px solid #ddd;
     background: #f0f0f0;
     flex-shrink: 0; /* Jangan biarkan input area mengecil */
@@ -314,23 +314,23 @@
 
 .chat-input-container {
     display: flex;
-    gap: 10px;
+    gap: 7px; /* 10 *0.7 */
     align-items: center;
 }
 
 .chat-input-container input {
     flex: 1;
-    padding: 12px 15px;
+    padding: 8.4px 10.5px; /* 12px 15px *0.7 */
     border: 1px solid #ccc;
-    border-radius: 25px;
-    font-size: 14px;
+    border-radius: 17.5px; /* 25 *0.7 */
+    font-size: 9.8px; /* 14 *0.7 */
     outline: none;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 0.7px 1.4px rgba(0, 0, 0, 0.05);
 }
 
 .chat-input-container input:focus {
     border-color: #007bff;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05), 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    box-shadow: inset 0 0.7px 1.4px rgba(0, 0, 0, 0.05), 0 0 0 0.14rem rgba(0, 123, 255, 0.25); /* 0.2rem ~ scaled visual */
 }
 
 .chat-input-container button {
@@ -340,8 +340,8 @@
     border-radius: 50%;
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s ease-in-out;
-    width: 45px;
-    height: 45px;
+    width: 31.5px; /* 45 *0.7 */
+    height: 31.5px; /* 45 *0.7 */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -363,11 +363,11 @@
     /* FIXED: Pastikan chat main container memiliki batasan tinggi yang tepat */
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 180px); /* Sesuaikan dengan tinggi viewport minus navbar + header */
-    max-height: calc(100vh - 180px);
+    height: calc(100vh - 126px); /* 180 *0.7 */
+    max-height: calc(100vh - 126px);
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 10.5px; /* 15 *0.7 */
+    box-shadow: 0 7px 21px rgba(0, 0, 0, 0.1);
     border: 1px solid #e0e0e0;
     overflow: hidden; /* Cegah overflow keluar container */
 }
@@ -390,7 +390,7 @@
 /* ========================================================== */
 .chat-image {
     max-width: 100%;
-    border-radius: 8px;
+    border-radius: 5.6px; /* 8 *0.7 */
     cursor: pointer;
 }
 
@@ -399,17 +399,17 @@
 }
 
 .message-caption {
-    margin-top: 5px;
-    font-size: 14px;
-    padding-bottom: 5px;
+    margin-top: 3.5px; /* 5 *0.7 */
+    font-size: 9.8px; /* 14 *0.7 */
+    padding-bottom: 3.5px; /* 5 *0.7 */
 }
 
 .chat-file-link {
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 7px; /* 10 *0.7 */
     background-color: #f1f1f1;
-    border-radius: 8px;
+    border-radius: 5.6px; /* 8 *0.7 */
     text-decoration: none;
     color: #333;
     transition: background-color 0.2s;
@@ -429,8 +429,8 @@
 }
 
 .file-icon {
-    font-size: 24px;
-    margin-right: 12px;
+    font-size: 16.8px; /* 24 *0.7 */
+    margin-right: 8.4px; /* 12 *0.7 */
 }
 
 .file-info {
@@ -464,7 +464,7 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    padding: 20px;
+    padding: 14px; /* 20 *0.7 */
     box-sizing: border-box;
 }
 
@@ -483,15 +483,15 @@
     max-height: 80vh;
     display: block;
     margin: 0 auto;
-    border-radius: 5px;
+    border-radius: 3.5px; /* 5 *0.7 */
 }
 
 .close-modal {
     position: absolute;
-    top: 15px;
-    right: 35px;
+    top: 10.5px; /* 15 *0.7 */
+    right: 24.5px; /* 35 *0.7 */
     color: #f1f1f1;
-    font-size: 40px;
+    font-size: 28px; /* 40 *0.7 */
     font-weight: bold;
     transition: 0.3s;
     cursor: pointer;
@@ -504,69 +504,73 @@
 }
 
 .download-button {
-    margin-top: 20px;
-    padding: 10px 25px;
+    margin-top: 14px; /* 20 *0.7 */
+    padding: 7px 17.5px; /* 10px 25px *0.7 */
     background-color: #007bff;
     color: white;
     text-decoration: none;
-    border-radius: 20px;
+    border-radius: 14px; /* 20 *0.7 */
     font-weight: bold;
     transition: background-color 0.2s;
     display: inline-flex;
     align-items: center;
 }
 .download-button i {
-    margin-right: 8px;
+    margin-right: 5.6px; /* 8 *0.7 */
 }
 
 .download-button:hover {
     background-color: #0056b3;
 }
 
+.chat-selected-file { display:flex; align-items:center; gap:.5rem; padding:.4rem .6rem; border:1px solid #ddd; border-radius:10px; }
+.chat-selected-file .thumb { width:36px; height:36px; object-fit:cover; border-radius:6px; }
+.chat-selected-file .remove { border:none; background:#eee; border-radius:50%; width:24px; height:24px; cursor:pointer; }
+
 /* ========================================================== */
 /* === RESPONSIVE DESIGN UNTUK CHAT === */
 /* ========================================================== */
 @media (max-width: 768px) {
     #chatView {
-        height: calc(100vh - 160px); /* Sesuaikan untuk mobile dengan ruang input */
-        max-height: calc(100vh - 160px);
+        height: calc(100vh - 112px); /* 160 *0.7 */
+        max-height: calc(100vh - 112px);
     }
     
     .chat-main-container {
-        height: calc(100vh - 160px);
-        max-height: calc(100vh - 160px);
+        height: calc(100vh - 112px);
+        max-height: calc(100vh - 112px);
     }
     
     #chatView .chat-sidebar {
-        width: 280px; /* Sedikit lebih kecil di mobile */
+        width: 196px; /* 280 *0.7 */
     }
     
     .chat-messages {
-        padding: 15px; /* Kurangi padding di mobile */
+        padding: 10.5px; /* 15 *0.7 */
     }
 }
 
 @media (max-width: 480px) {
     #chatView {
-        height: calc(100vh - 140px);
-        max-height: calc(100vh - 140px);
+        height: calc(100vh - 98px); /* 140 *0.7 */
+        max-height: calc(100vh - 98px);
     }
     
     .chat-main-container {
-        height: calc(100vh - 140px);
-        max-height: calc(100vh - 140px);
+        height: calc(100vh - 98px);
+        max-height: calc(100vh - 98px);
     }
     
     #chatView .chat-sidebar {
-        width: 250px;
+        width: 175px; /* 250 *0.7 */
     }
     
     .chat-messages {
-        padding: 10px;
+        padding: 7px; /* 10 *0.7 */
     }
     
     .chat-input-area {
-        padding: 10px 15px;
-        min-height: 60px; /* Kurangi min-height di mobile */
+        padding: 7px 10.5px; /* 10px 15px *0.7 */
+        min-height: 42px; /* 60 *0.7 */
     }
 }
