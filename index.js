@@ -6,10 +6,8 @@ const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
 const path = require("path");
 
-// DITAMBAHKAN: Socket.IO
 const { Server } = require('socket.io');
 
-// DITAMBAHKAN: Impor untuk fitur import dan upload
 const multer = require('multer');
 const fs = require('fs');
 const csv = require('csv-parser');
@@ -18,7 +16,6 @@ const xlsx = require('xlsx');
 const app = express();
 const port = 3000;
 
-// DITAMBAHKAN: Setup HTTP Server untuk Socket.IO
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
@@ -33,20 +30,18 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static("public"));
 
-// ✅ PERBAIKAN UTAMA: Setup folder media dan endpoint
 const mediaDir = path.join(__dirname, 'media');
 if (!fs.existsSync(mediaDir)) {
     fs.mkdirSync(mediaDir, { recursive: true });
 }
 app.use('/media', express.static(mediaDir));
 
-// DITAMBAHKAN: Konfigurasi Multer untuk menangani upload file
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// ✅ KONFIGURASI MULTER UNTUK CHAT MEDIA
+
 const chatMediaStorage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, mediaDir);
@@ -93,7 +88,6 @@ const client = new Client({
 });
 app.locals.whatsappClient = client;
 
-// DITAMBAHKAN: Set WhatsApp client dan Socket.IO untuk routes
 app.set('whatsappClient', client);
 app.set('io', io);
 
@@ -117,10 +111,11 @@ client.on("ready", () => {
     }
 });
 
-// ✅ PERBAIKAN UTAMA: Handler untuk pesan masuk dengan media support
 client.on('message', async (message) => {
     try {
-        if (message.fromMe) return;
+         if (!message.from.endsWith('@c.us') || message.fromMe) {
+        return;
+    }
 
         const fromNumber = message.from.replace('@c.us', '');
         let messageContent = message.body || '';
