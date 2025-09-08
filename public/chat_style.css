@@ -66,6 +66,7 @@
 }
 
 .chat-search {
+    position: relative;
     display: flex;
     padding: 15px;
     border-bottom: 1px solid #ddd;
@@ -84,10 +85,13 @@
 
 .chat-search i {
     display: flex;
-    position: relative;
-    transform: translateX(-200%);
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
     color: #666;
     align-items: center;
+    pointer-events: none;
 }
 
 /* FIXED: Area daftar chat yang bisa di-scroll dengan tinggi terbatas */
