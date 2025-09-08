@@ -2,9 +2,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const http = require('http');
 const cors = require("cors");
-const { Client, LocalAuth } = require("whatsapp-web.js");
+const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
-const path = require("path"); // DITAMBAHKAN
+const path = require("path");
 
 // DITAMBAHKAN: Socket.IO
 const { Server } = require('socket.io');
@@ -29,16 +29,58 @@ const io = new Server(server, {
 
 // Middleware Express
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static("public"));
-app.use('/media', express.static(path.join(__dirname, 'media')));
+
+// ✅ PERBAIKAN UTAMA: Setup folder media dan endpoint
+const mediaDir = path.join(__dirname, 'media');
+if (!fs.existsSync(mediaDir)) {
+    fs.mkdirSync(mediaDir, { recursive: true });
+}
+app.use('/media', express.static(mediaDir));
 
 // DITAMBAHKAN: Konfigurasi Multer untuk menangani upload file
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
+    fs.mkdirSync(uploadDir, { recursive: true });
 }
+
+// ✅ KONFIGURASI MULTER UNTUK CHAT MEDIA
+const chatMediaStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, mediaDir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = path.extname(file.originalname);
+        cb(null, uniqueSuffix + extension);
+    }
+});
+
+const uploadChatMedia = multer({ 
+    storage: chatMediaStorage,
+    limits: { 
+        fileSize: 16 * 1024 * 1024 // 16MB limit
+    },
+    fileFilter: (req, file, cb) => {
+        // Support berbagai format media
+        const allowedMimes = [
+            'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+            'video/mp4', 'video/quicktime', 'video/x-msvideo',
+            'audio/mpeg', 'audio/wav', 'audio/ogg',
+            'application/pdf', 'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
+        
+        if (allowedMimes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('File type not supported'), false);
+        }
+    }
+});
+
 const upload = multer({ dest: uploadDir });
 
 // Inisialisasi Client WhatsApp
@@ -75,40 +117,105 @@ client.on("ready", () => {
     }
 });
 
-// DITAMBAHKAN: Listener untuk pesan masuk WhatsApp
+// ✅ PERBAIKAN UTAMA: Handler untuk pesan masuk dengan media support
 client.on('message', async (message) => {
     try {
         if (message.fromMe) return;
 
         const fromNumber = message.from.replace('@c.us', '');
-        let messageContent = message.body;
-        let messageType = message.type || 'chat';
+        let messageContent = message.body || '';
+        let messageType = 'chat';
         let mediaUrl = null;
+        let mediaData = null;
 
-        // ✅ LANGKAH KUNCI: Cek jika pesan memiliki media
+        console.log(`📨 Pesan masuk dari ${fromNumber}:`, message.type);
+
+        // ✅ HANDLING MEDIA DENGAN DETAIL
         if (message.hasMedia) {
-            const media = await message.downloadMedia();
-            
-            // Hanya proses jika tipenya gambar dan datanya ada
-            if (media && media.mimetype.startsWith('image/')) {
-                // Buat nama file yang unik
-                const fileName = `${Date.now()}_${media.filename || fromNumber + '.jpg'}`;
-                const filePath = path.join(mediaDir, fileName);
-
-                // Simpan file gambar
-                fs.writeFileSync(filePath, Buffer.from(media.data, 'base64'));
-
-                // Siapkan URL yang akan diakses oleh frontend
-                mediaUrl = `/media/${fileName}`;
-                messageType = 'image'; // Ganti tipe pesan menjadi 'image'
-                messageContent = '[Gambar]'; // Teks pengganti untuk notifikasi
+            try {
+                console.log(`🔄 Mengunduh media dari ${fromNumber}...`);
+                const media = await message.downloadMedia();
                 
-                console.log(`🖼️ Gambar diterima dan disimpan di: ${filePath}`);
+                if (media && media.data) {
+                    // Tentukan ekstensi file
+                    let extension = '.unknown';
+                    if (media.mimetype) {
+                        const mimeToExt = {
+                            'image/jpeg': '.jpg',
+                            'image/png': '.png',
+                            'image/gif': '.gif',
+                            'image/webp': '.webp',
+                            'video/mp4': '.mp4',
+                            'video/quicktime': '.mov',
+                            'audio/mpeg': '.mp3',
+                            'audio/wav': '.wav',
+                            'audio/ogg': '.ogg',
+                            'application/pdf': '.pdf',
+                            'application/msword': '.doc',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx'
+                        };
+                        extension = mimeToExt[media.mimetype] || '.unknown';
+                    }
+
+                    // Buat nama file unik
+                    const fileName = `${Date.now()}_${fromNumber}${extension}`;
+                    const filePath = path.join(mediaDir, fileName);
+
+                    // Simpan file
+                    fs.writeFileSync(filePath, Buffer.from(media.data, 'base64'));
+                    
+                    mediaUrl = `/media/${fileName}`;
+                    
+                    // Tentukan tipe pesan berdasarkan mimetype
+                    if (media.mimetype.startsWith('image/')) {
+                        messageType = 'image';
+                        messageContent = message.body || '[Gambar]';
+                    } else if (media.mimetype.startsWith('video/')) {
+                        messageType = 'video';
+                        messageContent = message.body || '[Video]';
+                    } else if (media.mimetype.startsWith('audio/')) {
+                        messageType = 'audio';
+                        messageContent = message.body || '[Audio]';
+                    } else if (media.mimetype === 'application/pdf') {
+                        messageType = 'document';
+                        messageContent = message.body || '[Dokumen PDF]';
+                    } else {
+                        messageType = 'document';
+                        messageContent = message.body || '[Dokumen]';
+                    }
+
+                    // Simpan metadata media
+                    mediaData = {
+                        filename: media.filename || fileName,
+                        mimetype: media.mimetype,
+                        size: Buffer.from(media.data, 'base64').length,
+                        url: mediaUrl
+                    };
+
+                    console.log(`✅ Media berhasil disimpan: ${filePath}`);
+                } else {
+                    console.log(`❌ Gagal mengunduh media dari ${fromNumber}`);
+                    messageContent = '[Media tidak dapat diunduh]';
+                    messageType = 'error';
+                }
+            } catch (mediaError) {
+                console.error('❌ Error downloading media:', mediaError);
+                messageContent = '[Error mengunduh media]';
+                messageType = 'error';
             }
+        } else if (message.type === 'location') {
+            messageType = 'location';
+            messageContent = `Lokasi: ${message.location.latitude}, ${message.location.longitude}`;
+        } else if (message.type === 'vcard') {
+            messageType = 'contact';
+            messageContent = '[Kontak]';
         }
 
-        // Jika tidak ada media atau media bukan gambar, proses seperti biasa
-        if (messageType === 'chat' && !message.body) return; // Abaikan pesan kosong non-media
+        // Skip pesan kosong tanpa media
+        if (!messageContent && !mediaUrl) {
+            console.log('⚠️ Pesan kosong tanpa konten, diabaikan');
+            return;
+        }
 
         const messageData = {
             fromNumber: fromNumber,
@@ -116,32 +223,40 @@ client.on('message', async (message) => {
             direction: 'in',
             timestamp: new Date().toISOString(),
             messageType: messageType,
-            mediaUrl: mediaUrl, // <-- Simpan URL media
+            mediaUrl: mediaUrl,
+            mediaData: mediaData ? JSON.stringify(mediaData) : null,
             isRead: false
         };
 
-        // Simpan ke database (tambahkan kolom mediaUrl jika perlu)
+        // Simpan ke database dengan kolom mediaData
         const insertQuery = `
-            INSERT INTO chats (fromNumber, message, direction, timestamp, messageType, mediaUrl, isRead)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO chats (fromNumber, message, direction, timestamp, messageType, mediaUrl, mediaData, isRead)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
         
         db.run(insertQuery, [
             messageData.fromNumber, messageData.message, messageData.direction,
-            messageData.timestamp, messageData.messageType, messageData.mediaUrl, messageData.isRead
+            messageData.timestamp, messageData.messageType, messageData.mediaUrl, 
+            messageData.mediaData, messageData.isRead
         ], function(err) {
             if (err) {
-                console.error('Error menyimpan pesan masuk:', err);
+                console.error('❌ Error menyimpan pesan masuk:', err);
                 return;
             }
             
-            const completeMessageData = { id: this.lastID, ...messageData };
+            const completeMessageData = { 
+                id: this.lastID, 
+                ...messageData,
+                mediaData: mediaData // Kirim sebagai object, bukan JSON string
+            };
+            
+            // Emit ke frontend
             io.emit('newIncomingMessage', completeMessageData);
-            console.log('✅ Pesan (termasuk media) berhasil di-emit ke frontend');
+            console.log(`✅ Pesan (${messageType}) berhasil disimpan dan dikirim ke frontend`);
         });
 
     } catch (error) {
-        console.error('Error handling incoming message:', error);
+        console.error('❌ Error handling incoming message:', error);
     }
 });
 
@@ -159,29 +274,125 @@ client.initialize();
 // Inisialisasi Database SQLite dari file terpisah
 const db = require("./database.js");
 
-// (Catatan: Blok impor modul di bawah ini mungkin perlu dihapus jika semua logika Anda masih di index.js)
+// Import modules
 const schedulesModule = require("./routes/schedules.js");
 const meetingsModule = require("./routes/meetings");
 const createContactsRouter = require("./routes/contacts");
-
-// DITAMBAHKAN: Import chat routes
 const createChatsRouter = require("./routes/chats");
 
 // Setup routers
 app.use("/", schedulesModule.router);
 app.use("/", meetingsModule.router);
 app.use("/api/contacts", createContactsRouter(db));
-
-// DITAMBAHKAN: Setup chat routes
 app.use("/api/chats", createChatsRouter(db, client, io));
-app.use('/media', express.static(path.join(__dirname, 'media')));
 
+// ✅ ENDPOINT BARU: Upload dan kirim media dari admin
+app.post('/api/chats/send-media', uploadChatMedia.single('media'), async (req, res) => {
+    try {
+        const { to, message: caption } = req.body;
+        
+        if (!to) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Nomor tujuan harus diisi' 
+            });
+        }
 
-// DITAMBAHKAN: Socket.IO connection handling
+        if (!req.file) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'File media harus dipilih' 
+            });
+        }
+
+        if (!client || !client.info) {
+            return res.status(500).json({ 
+                success: false, 
+                message: 'WhatsApp client tidak tersedia' 
+            });
+        }
+
+        // Baca file yang diupload
+        const media = MessageMedia.fromFilePath(req.file.path);
+        const formattedNumber = to.includes('@c.us') ? to : `${to}@c.us`;
+
+        // Kirim media ke WhatsApp
+        await client.sendMessage(formattedNumber, media, { caption: caption || '' });
+
+        // Pindahkan file ke folder media permanen
+        const permanentPath = path.join(mediaDir, req.file.filename);
+        fs.renameSync(req.file.path, permanentPath);
+        
+        const mediaUrl = `/media/${req.file.filename}`;
+        
+        // Tentukan message type berdasarkan mimetype
+        let messageType = 'document';
+        if (req.file.mimetype.startsWith('image/')) messageType = 'image';
+        else if (req.file.mimetype.startsWith('video/')) messageType = 'video';
+        else if (req.file.mimetype.startsWith('audio/')) messageType = 'audio';
+
+        // Simpan ke database
+        const timestamp = new Date().toISOString();
+        const displayMessage = caption || `[${messageType.charAt(0).toUpperCase() + messageType.slice(1)}]`;
+        
+        const mediaData = {
+            filename: req.file.originalname,
+            mimetype: req.file.mimetype,
+            size: req.file.size,
+            url: mediaUrl
+        };
+
+        const insertQuery = `
+            INSERT INTO chats (fromNumber, message, direction, timestamp, messageType, mediaUrl, mediaData, isRead)
+            VALUES (?, ?, 'out', ?, ?, ?, ?, TRUE)
+        `;
+        
+        db.run(insertQuery, [
+            to, displayMessage, timestamp, messageType, mediaUrl, JSON.stringify(mediaData)
+        ], function(err) {
+            if (err) {
+                console.error('Error menyimpan media keluar:', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Media terkirim tapi gagal disimpan ke database' 
+                });
+            }
+            
+            const messageData = {
+                id: this.lastID,
+                fromNumber: to,
+                message: displayMessage,
+                direction: 'out',
+                timestamp: timestamp,
+                messageType: messageType,
+                mediaUrl: mediaUrl,
+                mediaData: mediaData,
+                isRead: true
+            };
+            
+            io.emit('messageSent', messageData);
+            
+            res.json({ 
+                success: true, 
+                message: 'Media berhasil dikirim',
+                data: messageData
+            });
+        });
+        
+    } catch (error) {
+        console.error('Error sending media:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Gagal mengirim media',
+            details: error.message 
+        });
+    }
+});
+
+// Socket.IO connection handling
 io.on('connection', (socket) => {
     console.log('👤 Admin connected:', socket.id);
     
-    // Handle test event dari frontend
     socket.on('test', (data) => {
         console.log('🧪 Test event received from frontend:', data);
         socket.emit('testResponse', { message: 'Backend received test' });
@@ -191,7 +402,6 @@ io.on('connection', (socket) => {
         console.log('👤 Admin disconnected:', socket.id);
     });
     
-    // Debug: Log semua events yang diterima
     socket.onAny((eventName, ...args) => {
         console.log('📡 Socket event from client:', eventName, args);
     });
@@ -470,51 +680,52 @@ app.post('/api/import', upload.single('contactFile'), (req, res) => {
 
 // Error handling middleware
 app.use((error, req, res, next) => {
-    // ... (Logika error handling Anda)
+    console.error(error.stack);
+    res.status(500).json({ message: 'Something went wrong!' });
 });
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({
-    error: "Not Found",
-    message: `Route ${req.method} ${req.path} not found`,
-  });
+    res.status(404).json({
+        error: "Not Found",
+        message: `Route ${req.method} ${req.path} not found`,
+    });
 });
 
 // Graceful shutdown
 process.on("SIGTERM", () => {
-  console.log("SIGTERM received. Shutting down gracefully...");
-  client.destroy();
-  db.close((err) => {
-    if (err) {
-      console.error("Error closing database:", err.message);
-    } else {
-      console.log("Database connection closed.");
-    }
-    process.exit(0);
-  });
+    console.log("SIGTERM received. Shutting down gracefully...");
+    client.destroy();
+    db.close((err) => {
+        if (err) {
+            console.error("Error closing database:", err.message);
+        } else {
+            console.log("Database connection closed.");
+        }
+        process.exit(0);
+    });
 });
 
 process.on("SIGINT", () => {
-  console.log("SIGINT received. Shutting down gracefully...");
-  client.destroy();
-  db.close((err) => {
-    if (err) {
-      console.error("Error closing database:", err.message);
-    } else {
-      console.log("Database connection closed.");
-    }
-    process.exit(0);
-  });
+    console.log("SIGINT received. Shutting down gracefully...");
+    client.destroy();
+    db.close((err) => {
+        if (err) {
+            console.error("Error closing database:", err.message);
+        } else {
+            console.log("Database connection closed.");
+        }
+        process.exit(0);
+    });
 });
 
-
-// DIUBAH: Gunakan server.listen() bukan app.listen() untuk Socket.IO
+// Gunakan server.listen() bukan app.listen() untuk Socket.IO
 server.listen(port, () => {
-  console.log(`Server berjalan di http://localhost:${port}`);
-  console.log(`Socket.IO server ready`);
-  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-  console.log("=".repeat(50));
+    console.log(`Server berjalan di http://localhost:${port}`);
+    console.log(`Socket.IO server ready`);
+    console.log(`Media folder: ${mediaDir}`);
+    console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+    console.log("=".repeat(50));
 });
 
 module.exports = app;
