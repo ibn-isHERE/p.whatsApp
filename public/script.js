@@ -2709,5 +2709,102 @@ async function loadChatConversations() {
     }
 }
 
+// di script.js
+const attachBtn = document.getElementById('attachFileBtn');
+const chatFileInput = document.getElementById('chatFileInput');
+
+attachBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  chatFileInput.click();
+});
+
+const chatInputContainer = document.querySelector('.chat-input-container');
+const replyInput = document.getElementById('replyInput');
+
+let selectedFilePreviewEl = null;
+
+chatFileInput.addEventListener('change', () => {
+  // bersihkan preview lama
+  if (selectedFilePreviewEl) selectedFilePreviewEl.remove();
+
+  if (!chatFileInput.files.length) return;
+  const f = chatFileInput.files[0];
+
+  // buat chip preview
+  const wrap = document.createElement('div');
+  wrap.className = 'chat-selected-file';
+
+  const name = document.createElement('span');
+  name.className = 'file-name';
+  name.textContent = f.name + ` (${Math.round(f.size/1024)} KB)`;
+  wrap.appendChild(name);
+
+  // thumbnail opsional
+  if (f.type.startsWith('image/')) {
+    const img = document.createElement('img');
+    img.className = 'thumb';
+    img.src = URL.createObjectURL(f);
+    img.onload = () => URL.revokeObjectURL(img.src);
+    wrap.prepend(img);
+  }
+
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'remove';
+  removeBtn.innerHTML = '&times;';
+  removeBtn.onclick = () => { chatFileInput.value = ''; wrap.remove(); selectedFilePreviewEl = null; };
+  wrap.appendChild(removeBtn);
+
+  // sisipkan sebelum input teks
+  chatInputContainer.insertBefore(wrap, replyInput);
+  selectedFilePreviewEl = wrap;
+});
+
+const sendReplyBtn = document.getElementById('sendReplyBtn');
+
+// simpan nomor aktif saat user memilih percakapan
+// pastikan kamu set ini di handler ketika user klik sebuah chat
+window.activeChatNumber = window.activeChatNumber || null;
+
+sendReplyBtn.addEventListener('click', async () => {
+  const to = window.activeChatNumber || document.getElementById('activeContactNumber').dataset.number || document.getElementById('activeContactNumber').textContent.trim();
+  const caption = replyInput.value.trim();
+  const hasFile = chatFileInput.files.length > 0;
+
+  if (!to) { alert('Pilih percakapan dulu.'); return; }
+
+  try {
+    if (hasFile) {
+      const fd = new FormData();
+      fd.append('to', to);
+      fd.append('caption', caption);
+      fd.append('media', chatFileInput.files[0]); // <— harus 'media'
+
+      const res = await fetch('/api/chats/send-media', { method: 'POST', body: fd });
+      const out = await res.json();
+      if (!out.success) throw new Error(out.message || 'Gagal mengirim media');
+
+      // reset UI
+      chatFileInput.value = '';
+      if (selectedFilePreviewEl) { selectedFilePreviewEl.remove(); selectedFilePreviewEl = null; }
+      replyInput.value = '';
+    } else if (caption) {
+      const res = await fetch('/api/chats/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to, message: caption })
+      });
+      const out = await res.json();
+      if (!out.success) throw new Error(out.message || 'Gagal mengirim pesan');
+      replyInput.value = '';
+    } else {
+      alert('Ketik pesan atau pilih file terlebih dahulu.');
+    }
+  } catch (e) {
+    console.error(e);
+    alert(e.message);
+  }
+});
+
 // Jalankan aplikasi ketika DOM siap
 document.addEventListener("DOMContentLoaded", initApp);
