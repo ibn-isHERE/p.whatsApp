@@ -1,281 +1,442 @@
 <!DOCTYPE html>
 <html lang="id">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Pesan Pengingat</title>
-    <link rel="icon" type="image/x-icon" href="/wa_pengingat/public/asset/result_bps.png">
-    <link rel="stylesheet" href="chat_style.css">
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="/wa_pengingat/public/asset/result_bps.png"
+    />
+    <link rel="stylesheet" href="chat_style.css" />
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
     <!-- Socket.IO Client -->
     <script src="/socket.io/socket.io.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="navbar">
-        <div class="navbar-left">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Lambang_Badan_Pusat_Statistik_%28BPS%29_Indonesia.svg/1726px-Lambang_Badan_Pusat_Statistik_%28BPS%29_Indonesia.svg.png"
-                alt="Logo BPS" />
-            <span class="navbar-text">Badan Pusat Statistik</span>
-        </div>
+      <div class="navbar-left">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Lambang_Badan_Pusat_Statistik_%28BPS%29_Indonesia.svg/1726px-Lambang_Badan_Pusat_Statistik_%28BPS%29_Indonesia.svg.png"
+          alt="Logo BPS"
+        />
+        <span class="navbar-text">Badan Pusat Statistik</span>
+      </div>
     </div>
 
     <main>
-        <div class="app-header">
-            <h1>Pesan Pengingat WhatsApp</h1>
-        </div>
+      <div class="app-header">
+        <h1>Pesan Pengingat WhatsApp</h1>
+      </div>
 
-        <div class="main-content">
-            <!-- Form Container - Left Side -->
-            <section class="form-container">
-                <div class="tabs">
-                    <button class="tab-button active" onclick="showForm('message')">
-                        <i class="fa-solid fa-envelope"></i> Kirim Pesan
-                    </button>
-                    <button class="tab-button" onclick="showForm('meeting')">
-                        <i class="fa-solid fa-calendar-check"></i> Jadwal Rapat
-                    </button>
-                    <button class="tab-button" onclick="showForm('contacts')">
-                        <i class="fa-solid fa-address-book"></i> Manajemen Kontak
-                    </button>
-                    <button class="tab-button" onclick="showForm('chat')">
-                        <i class="fa-solid fa-comments"></i> Customer Service
-                        <span id="chatBadge" class="notification-badge" style="display: none;">0</span>
-                    </button>
+      <div class="main-content">
+        <!-- Form Container - Left Side -->
+        <section class="form-container">
+          <div class="tabs">
+            <button class="tab-button active" onclick="showForm('message')">
+              <i class="fa-solid fa-envelope"></i> Kirim Pesan
+            </button>
+            <button class="tab-button" onclick="showForm('meeting')">
+              <i class="fa-solid fa-calendar-check"></i> Jadwal Rapat
+            </button>
+            <button class="tab-button" onclick="showForm('contacts')">
+              <i class="fa-solid fa-address-book"></i> Manajemen Kontak
+            </button>
+            <button class="tab-button" onclick="showForm('chat')">
+              <i class="fa-solid fa-comments"></i> Customer Service
+              <span
+                id="chatBadge"
+                class="notification-badge"
+                style="display: none"
+                >0</span
+              >
+            </button>
+          </div>
+
+          <!-- Message Form -->
+          <div id="messageFormContainer" class="form-content active">
+            <h2>Buat Jadwal Pesan</h2>
+            <form id="reminderForm" enctype="multipart/form-data">
+              <label for="contactSearch">Pilih Kontak dari Daftar:</label>
+              <input
+                type="text"
+                id="contactSearch"
+                placeholder="Cari kontak..."
+                autocomplete="off"
+              />
+              <div class="select-all-container">
+                <label for="selectAllContacts">Pilih Semua</label>
+                <input type="checkbox" id="selectAllContacts" />
+              </div>
+              <div id="contactList" class="contact-checklist-box"></div>
+              <label for="manualNumbers"
+                >Nomor Manual (pisahkan dengan koma):</label
+              >
+              <input
+                type="text"
+                id="manualNumbers"
+                placeholder="08123456789, 08234567890"
+              />
+              <div class="file-upload-section">
+                <label>Pilih File (Gambar, Video, PDF):</label>
+                <div
+                  class="file-upload-container"
+                  onclick="document.getElementById('fileUpload').click()"
+                >
+                  <input
+                    type="file"
+                    id="fileUpload"
+                    name="fileUpload"
+                    accept="image/*,video/*,application/pdf"
+                    multiple
+                  />
+                  <span class="file-upload-label">Klik untuk memilih file</span>
+                  <div id="fileNames" class="file-name">
+                    Belum ada file terpilih
+                  </div>
                 </div>
+              </div>
+              <div id="keepFileCheckboxDiv" style="display: none">
+                <input
+                  type="checkbox"
+                  id="keepOriginalFile"
+                  name="keepOriginalFile"
+                  checked
+                />
+                <label for="keepOriginalFile">Pertahankan file lama</label>
+              </div>
+              <label for="message">Pesan:</label>
+              <textarea
+                id="message"
+                name="message"
+                placeholder="Tulis pesan..."
+                rows="4"
+              ></textarea>
+              <label for="datetime">Waktu Kirim:</label>
+              <input
+                type="datetime-local"
+                id="datetime"
+                name="datetime"
+                required
+              />
+              <button type="submit">Kirim</button>
+            </form>
+          </div>
 
-                <!-- Message Form -->
-                <div id="messageFormContainer" class="form-content active">
-                    <h2>Buat Jadwal Pesan</h2>
-                    <form id="reminderForm" enctype="multipart/form-data">
-                        <label for="contactSearch">Pilih Kontak dari Daftar:</label>
-                        <input type="text" id="contactSearch" placeholder="Cari kontak..." autocomplete="off" />
-                        <div class="select-all-container">
-                            <label for="selectAllContacts">Pilih Semua</label>
-                            <input type="checkbox" id="selectAllContacts" />
-                        </div>
-                        <div id="contactList" class="contact-checklist-box"></div>
-                        <label for="manualNumbers">Nomor Manual (pisahkan dengan koma):</label>
-                        <input type="text" id="manualNumbers" placeholder="08123456789, 08234567890" />
-                        <div class="file-upload-section">
-                            <label>Pilih File (Gambar, Video, PDF):</label>
-                            <div class="file-upload-container" onclick="document.getElementById('fileUpload').click()">
-                                <input type="file" id="fileUpload" name="fileUpload"
-                                    accept="image/*,video/*,application/pdf" multiple />
-                                <span class="file-upload-label">Klik untuk memilih file</span>
-                                <div id="fileNames" class="file-name">Belum ada file terpilih</div>
-                            </div>
-                        </div>
-                        <div id="keepFileCheckboxDiv" style="display:none;">
-                            <input type="checkbox" id="keepOriginalFile" name="keepOriginalFile" checked>
-                            <label for="keepOriginalFile">Pertahankan file lama</label>
-                        </div>
-                        <label for="message">Pesan:</label>
-                        <textarea id="message" name="message" placeholder="Tulis pesan..." rows="4"></textarea>
-                        <label for="datetime">Waktu Kirim:</label>
-                        <input type="datetime-local" id="datetime" name="datetime" required />
-                        <button type="submit">Kirim</button>
-                    </form>
+          <!-- Meeting Form -->
+          <div id="meetingFormContainer" class="form-content hidden">
+            <h2>Buat Jadwal Rapat</h2>
+            <form id="addMeetingForm">
+              <label for="meetingTitle">Judul Rapat:</label>
+              <input type="text" id="meetingTitle" required />
+
+              <label for="meetingContactSearch"
+                >Pilih Kontak dari Daftar:</label
+              >
+              <input
+                type="text"
+                id="meetingContactSearch"
+                placeholder="Cari kontak..."
+                autocomplete="off"
+              />
+              <div class="select-all-container">
+                <label for="selectAllMeetingContacts">Pilih Semua</label>
+                <input type="checkbox" id="selectAllMeetingContacts" />
+              </div>
+              <div id="meetingContactList" class="contact-checklist-box"></div>
+
+              <label for="meetingNumbers"
+                >Nomor Manual (pisahkan dengan koma):</label
+              >
+              <input
+                type="text"
+                id="meetingNumbers"
+                placeholder="081234567890, 089876543210"
+              />
+
+              <div class="file-upload-section">
+                <label>Pilih File untuk Rapat (Gambar, Video, PDF):</label>
+                <div
+                  class="file-upload-container"
+                  onclick="document.getElementById('meetingFileUpload').click()"
+                >
+                  <input
+                    type="file"
+                    id="meetingFileUpload"
+                    name="files"
+                    accept="image/*,video/*,application/pdf"
+                    multiple
+                  />
+                  <span class="file-upload-label">Klik untuk memilih file</span>
+                  <div id="meetingFileNames" class="file-name">
+                    Belum ada file terpilih
+                  </div>
                 </div>
+              </div>
+              <div id="meetingKeepFileCheckboxDiv" style="display: none">
+                <input
+                  type="checkbox"
+                  id="meetingKeepOriginalFile"
+                  name="meetingKeepOriginalFile"
+                  checked
+                />
+                <label for="meetingKeepOriginalFile"
+                  >Pertahankan file lama</label
+                >
+              </div>
 
-                <!-- Meeting Form -->
-                <div id="meetingFormContainer" class="form-content hidden">
-                    <h2>Buat Jadwal Rapat</h2>
-                    <form id="addMeetingForm">
-                        <label for="meetingTitle">Judul Rapat:</label>
-                        <input type="text" id="meetingTitle" required />
-                        
-                        <label for="meetingContactSearch">Pilih Kontak dari Daftar:</label>
-                        <input type="text" id="meetingContactSearch" placeholder="Cari kontak..." autocomplete="off" />
-                        <div class="select-all-container">
-                            <label for="selectAllMeetingContacts">Pilih Semua</label>
-                            <input type="checkbox" id="selectAllMeetingContacts" />
-                        </div>
-                        <div id="meetingContactList" class="contact-checklist-box"></div>
-                        
-                        <label for="meetingNumbers">Nomor Manual (pisahkan dengan koma):</label>
-                        <input type="text" id="meetingNumbers" placeholder="081234567890, 089876543210" />
-                        
-                        <div class="file-upload-section">
-                            <label>Pilih File untuk Rapat (Gambar, Video, PDF):</label>
-                            <div class="file-upload-container" onclick="document.getElementById('meetingFileUpload').click()">
-                                <input type="file" id="meetingFileUpload" name="files"
-                                    accept="image/*,video/*,application/pdf" multiple />
-                                <span class="file-upload-label">Klik untuk memilih file</span>
-                                <div id="meetingFileNames" class="file-name">Belum ada file terpilih</div>
-                            </div>
-                        </div>
-                        <div id="meetingKeepFileCheckboxDiv" style="display:none;">
-                            <input type="checkbox" id="meetingKeepOriginalFile" name="meetingKeepOriginalFile" checked>
-                            <label for="meetingKeepOriginalFile">Pertahankan file lama</label>
-                        </div>
-                        
-                        <label for="meetingRoom">Ruangan Rapat:</label>
-                        <select id="meetingRoom" required>
-                            <option value="">-- Pilih Ruangan --</option>
-                            <option value="Aula Lantai 3">Aula Lantai 3</option>
-                            <option value="Ruang Sungkai">Ruang Sungkai</option>
-                            <option value="Ruang distribusi">Ruang distribusi</option>
-                            <option value="Ruang Garda SE">Ruang Garda SE</option>
-                            <option value="Ruang PST">Ruang PST</option>
-                        </select>
-                        
-                        <div class="form-group">
-                            <label for="meetingStartTime">Waktu Mulai Rapat:</label>
-                            <input type="datetime-local" id="meetingStartTime" class="form-control" required>
-                        </div>
+              <label for="meetingRoom">Ruangan Rapat:</label>
+              <select id="meetingRoom" required>
+                <option value="">-- Pilih Ruangan --</option>
+                <option value="Aula Lantai 3">Aula Lantai 3</option>
+                <option value="Ruang Sungkai">Ruang Sungkai</option>
+                <option value="Ruang distribusi">Ruang distribusi</option>
+                <option value="Ruang Garda SE">Ruang Garda SE</option>
+                <option value="Ruang PST">Ruang PST</option>
+              </select>
 
-                        <div class="form-group">
-                            <label for="meetingEndTime">Waktu Selesai Rapat:</label>
-                            <input type="datetime-local" id="meetingEndTime" class="form-control" required>
-                        </div>
-                        
-                        <button type="submit">Jadwalkan Rapat</button>
-                    </form>
-                </div>
-                
-                <!-- Contact Management Form -->
-                <div id="contactsFormContainer" class="form-content hidden">
-                    <h2>Manajemen Kontak</h2>
+              <div class="form-group">
+                <label for="meetingStartTime">Waktu Mulai Rapat:</label>
+                <input
+                  type="datetime-local"
+                  id="meetingStartTime"
+                  class="form-control"
+                  required
+                />
+              </div>
 
-                    <form id="contact-crud-form">
-                        <h3>Tambah / Edit Kontak</h3>
-                        <input type="hidden" id="contact-crud-id">
-                        <input type="text" id="contact-crud-name" placeholder="Nama Kontak" required>
-                        <input type="tel" id="contact-crud-number" placeholder="Nomor (contoh: 0812...)" required>
-                        <button type="submit" id="contact-crud-submit">Tambah Kontak</button>
-                        <button type="button" id="contact-crud-cancel" style="display:none; background-color: #6c757d;">Batal</button>
-                    </form>
+              <div class="form-group">
+                <label for="meetingEndTime">Waktu Selesai Rapat:</label>
+                <input
+                  type="datetime-local"
+                  id="meetingEndTime"
+                  class="form-control"
+                  required
+                />
+              </div>
 
-                    <form id="import-form" action="/api/import" method="post" enctype="multipart/form-data">
-                        <h3>Import Kontak dari File</h3>
-                        <input type="file" name="contactFile" accept=".csv, .json, .xlsx, .xls" required>
-                        <button type="submit">Import</button>
-                    </form>
-                    
-                    <div class="table-wrapper" style="margin-top: 2em;">
-                        <h3>Daftar Kontak Tersimpan</h3>
-                        <table id="contact-management-table">
-                            <thead>
-                                <tr>
-                                    <th>Nama</th>
-                                    <th>Nomor</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contact-management-tbody">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+              <button type="submit">Jadwalkan Rapat</button>
+            </form>
+          </div>
 
-                <!-- Chat Sidebar (Only visible when chat tab is active) -->
-                <div id="chatSidebarContainer" class="form-content hidden">
-                    <h2>Daftar Percakapan</h2>
-                    
-                    <div class="chat-search">
-                        <input type="text" id="chatSearch" placeholder="Cari nomor atau pesan..." />
-                        <i class="fa-solid fa-search"></i>
-                    </div>
-                    
-                    <div class="chat-list" id="chatList">
-                        <!-- Chat conversations will be loaded here -->
-                    </div>
-                </div>
-            </section>
+          <!-- Contact Management Form -->
+          <div id="contactsFormContainer" class="form-content hidden">
+            <h2>Manajemen Kontak</h2>
 
-            <!-- Content Area - Right Side -->
-            <section class="content-area">
-                <!-- Schedule Table (visible for all tabs except chat) -->
-                <div class="schedule-container" id="scheduleContainer">
-                    <div class="schedule-header">
-                        <h2>Jadwal Pesan Terkirim/Terjadwal</h2>
-                        <div class="filter-buttons d-flex justify-content-center mb-3">
-                            <button class="filter-button active" data-filter="all">Semua</button>
-                            <button class="filter-button" data-filter="meeting">Jadwal Rapat</button>
-                            <button class="filter-button" data-filter="terjadwal">Terjadwal</button>
-                            <button class="filter-button" data-filter="terkirim">Terkirim</button>
-                            <button class="filter-button" data-filter="dibatalkan">Dibatalkan</button>
-                            <button class="filter-button" data-filter="gagal">Gagal</button>
-                        </div>
-                    </div>
+            <form id="contact-crud-form">
+              <h3>Tambah / Edit Kontak</h3>
+              <input type="hidden" id="contact-crud-id" />
+              <input
+                type="text"
+                id="contact-crud-name"
+                placeholder="Nama Kontak"
+                required
+              />
+              <input
+                type="tel"
+                id="contact-crud-number"
+                placeholder="Nomor (contoh: 0812...)"
+                required
+              />
+              <button type="submit" id="contact-crud-submit">
+                Tambah Kontak
+              </button>
+              <button
+                type="button"
+                id="contact-crud-cancel"
+                style="display: none; background-color: #6c757d"
+              >
+                Batal
+              </button>
+            </form>
 
-                    <div class="table-wrapper">
-                        <table id="scheduleTable">
-                            <thead>
-                                <tr>
-                                    <th>Waktu Terjadwal</th>
-                                    <th>Nomor Tujuan</th>
-                                    <th>Pesan</th>
-                                    <th>File</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <form
+              id="import-form"
+              action="/api/import"
+              method="post"
+              enctype="multipart/form-data"
+            >
+              <h3>Import Kontak dari File</h3>
+              <input
+                type="file"
+                name="contactFile"
+                accept=".csv, .json, .xlsx, .xls"
+                required
+              />
+              <button type="submit">Import</button>
+            </form>
 
-                <!-- Chat Main Area (visible only when chat tab is active) -->
-                <div class="chat-main-container" id="chatMainContainer" style="display: none;">
-                    <div class="chat-header" id="chatHeader">
-                        <div class="chat-info">
-                            <h3 id="activeContactName">Pilih percakapan</h3>
-                            <span id="activeContactNumber"></span>
-                        </div>
-                        <div class="chat-actions">
-                            <button id="refreshChatBtn" title="Refresh">
-                                <i class="fa-solid fa-refresh"></i>
-                            </button>
-                        </div>
-                    </div>
+            <div class="table-wrapper" style="margin-top: 2em">
+              <h3>Daftar Kontak Tersimpan</h3>
+              <table id="contact-management-table">
+                <thead>
+                  <tr>
+                    <th>Nama</th>
+                    <th>Nomor</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="contact-management-tbody"></tbody>
+              </table>
+            </div>
+          </div>
 
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="no-chat-selected">
-                            <i class="fa-solid fa-comments"></i>
-                            <p>Pilih percakapan untuk mulai chat</p>
-                        </div>
-                    </div>
+          <!-- Chat Sidebar (Only visible when chat tab is active) -->
+          <div id="chatSidebarContainer" class="form-content hidden">
+            <h2>Daftar Percakapan</h2>
 
-                    <div class="chat-input-area" id="chatInputArea" style="display: none;">
-                        <div class="chat-input-container">
-                            <input type="text" id="replyInput" placeholder="Ketik balasan..." />
-                            <button id="sendReplyBtn">
-                                <i class="fa-solid fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
+            <div class="chat-search">
+              <input
+                type="text"
+                id="chatSearch"
+                placeholder="Cari nomor atau pesan..."
+              />
+              <i class="fa-solid fa-search"></i>
+            </div>
+
+            <div class="chat-list" id="chatList">
+              <!-- Chat conversations will be loaded here -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Content Area - Right Side -->
+        <section class="content-area">
+          <!-- Schedule Table (visible for all tabs except chat) -->
+          <div class="schedule-container" id="scheduleContainer">
+            <div class="schedule-header">
+              <h2>Jadwal Pesan Terkirim/Terjadwal</h2>
+              <div class="filter-buttons d-flex justify-content-center mb-3">
+                <button class="filter-button active" data-filter="all">
+                  Semua
+                </button>
+                <button class="filter-button" data-filter="meeting">
+                  Jadwal Rapat
+                </button>
+                <button class="filter-button" data-filter="terjadwal">
+                  Terjadwal
+                </button>
+                <button class="filter-button" data-filter="terkirim">
+                  Terkirim
+                </button>
+                <button class="filter-button" data-filter="dibatalkan">
+                  Dibatalkan
+                </button>
+                <button class="filter-button" data-filter="gagal">Gagal</button>
+              </div>
+            </div>
+
+            <div class="table-wrapper">
+              <table id="scheduleTable">
+                <thead>
+                  <tr>
+                    <th>Waktu Terjadwal</th>
+                    <th>Nomor Tujuan</th>
+                    <th>Pesan</th>
+                    <th>File</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Chat Main Area (visible only when chat tab is active) -->
+          <div
+            class="chat-main-container"
+            id="chatMainContainer"
+            style="display: none"
+          >
+            <div class="chat-header" id="chatHeader">
+              <div class="chat-info">
+                <h3 id="activeContactName">Pilih percakapan</h3>
+                <span id="activeContactNumber"></span>
+              </div>
+              <div class="chat-actions">
+                <button id="refreshChatBtn" title="Refresh">
+                  <i class="fa-solid fa-refresh"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+              <div class="no-chat-selected">
+                <i class="fa-solid fa-comments"></i>
+                <p>Pilih percakapan untuk mulai chat</p>
+              </div>
+            </div>
+
+            <div
+              class="chat-input-area"
+              id="chatInputArea"
+              style="display: none"
+            >
+              <div class="chat-input-container">
+                <!-- Tombol pilih file -->
+                <input
+                  type="file"
+                  id="chatFileInput"
+                  accept="image/*,video/*,application/pdf"
+                  style="display: none"
+                />
+                <button id="attachFileBtn" title="Lampirkan File">
+                  <i class="fa-solid fa-paperclip"></i>
+                </button>
+
+                <!-- Input teks -->
+                <input
+                  type="text"
+                  id="replyInput"
+                  placeholder="Ketik balasan..."
+                />
+
+                <!-- Tombol kirim -->
+                <button id="sendReplyBtn" title="Kirim">
+                  <i class="fa-solid fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
 
     <footer>
-        <p>&copy; 2025 Pesan Pengingat. All rights reserved.</p>
+      <p>&copy; 2025 Pesan Pengingat. All rights reserved.</p>
     </footer>
 
     <!-- Media Modal -->
     <div id="mediaModal" class="modal">
-        <span class="close-modal" onclick="closeMediaModal()">&times;</span>
-        <div class="modal-content" id="modalContent">
-            <!-- Image or video will be inserted here by JavaScript -->
-        </div>
-        <a id="downloadLink" class="download-button" download>
-            <i class="fa-solid fa-download"></i> Unduh
-        </a>
+      <span class="close-modal" onclick="closeMediaModal()">&times;</span>
+      <div class="modal-content" id="modalContent">
+        <!-- Image or video will be inserted here by JavaScript -->
+      </div>
+      <a id="downloadLink" class="download-button" download>
+        <i class="fa-solid fa-download"></i> Unduh
+      </a>
     </div>
 
     <!-- Audio untuk notifikasi -->
     <audio id="notificationSound" preload="auto">
-        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFlApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+Dyv" type="audio/wav">
+      <source
+        src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFlApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiR1fLNeSsFJHfH8N2QQAoUXrTp66hVFApGn+Dyv"
+        type="audio/wav"
+      />
     </audio>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
