@@ -603,6 +603,17 @@ form button:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
 }
+
+.form-container {
+  flex: 0 0 500px; /* lebar kiri tetap */
+  max-width: 500px;
+}
+
+.content-area {
+  flex: 1;           /* kanan isi penuh */
+  min-width: 0;      /* biar tabel/chat tidak bikin melebar */
+  overflow-x: auto;  /* kalau isinya lebih lebar, muncul scroll */
+}
 /* --- AKHIR PENAMBAHAN CSS --- */
 
 
