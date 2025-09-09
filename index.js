@@ -113,147 +113,109 @@ client.on("ready", () => {
 
 client.on('message', async (message) => {
     try {
-         if (!message.from.endsWith('@c.us') || message.fromMe) {
-        return;
-    }
-
-        const fromNumber = message.from.replace('@c.us', '');
-        let messageContent = message.body || '';
-        let messageType = 'chat';
-        let mediaUrl = null;
-        let mediaData = null;
-
-        console.log(`📨 Pesan masuk dari ${fromNumber}:`, message.type);
-
-        // ✅ HANDLING MEDIA DENGAN DETAIL
-        if (message.hasMedia) {
-            try {
-                console.log(`🔄 Mengunduh media dari ${fromNumber}...`);
-                const media = await message.downloadMedia();
-                
-                if (media && media.data) {
-                    // Tentukan ekstensi file
-                    let extension = '.unknown';
-                    if (media.mimetype) {
-                        const mimeToExt = {
-                            'image/jpeg': '.jpg',
-                            'image/png': '.png',
-                            'image/gif': '.gif',
-                            'image/webp': '.webp',
-                            'video/mp4': '.mp4',
-                            'video/quicktime': '.mov',
-                            'audio/mpeg': '.mp3',
-                            'audio/wav': '.wav',
-                            'audio/ogg': '.ogg',
-                            'application/pdf': '.pdf',
-                            'application/msword': '.doc',
-                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx'
-                        };
-                        extension = mimeToExt[media.mimetype] || '.unknown';
-                    }
-
-                    // Buat nama file unik
-                    const fileName = `${Date.now()}_${fromNumber}${extension}`;
-                    const filePath = path.join(mediaDir, fileName);
-
-                    // Simpan file
-                    fs.writeFileSync(filePath, Buffer.from(media.data, 'base64'));
-                    
-                    mediaUrl = `/media/${fileName}`;
-                    
-                    // Tentukan tipe pesan berdasarkan mimetype
-                    if (media.mimetype.startsWith('image/')) {
-                        messageType = 'image';
-                        messageContent = message.body || '[Gambar]';
-                    } else if (media.mimetype.startsWith('video/')) {
-                        messageType = 'video';
-                        messageContent = message.body || '[Video]';
-                    } else if (media.mimetype.startsWith('audio/')) {
-                        messageType = 'audio';
-                        messageContent = message.body || '[Audio]';
-                    } else if (media.mimetype === 'application/pdf') {
-                        messageType = 'document';
-                        messageContent = message.body || '[Dokumen PDF]';
-                    } else {
-                        messageType = 'document';
-                        messageContent = message.body || '[Dokumen]';
-                    }
-
-                    // Simpan metadata media
-                    mediaData = {
-                        filename: media.filename || fileName,
-                        mimetype: media.mimetype,
-                        size: Buffer.from(media.data, 'base64').length,
-                        url: mediaUrl
-                    };
-
-                    console.log(`✅ Media berhasil disimpan: ${filePath}`);
-                } else {
-                    console.log(`❌ Gagal mengunduh media dari ${fromNumber}`);
-                    messageContent = '[Media tidak dapat diunduh]';
-                    messageType = 'error';
-                }
-            } catch (mediaError) {
-                console.error('❌ Error downloading media:', mediaError);
-                messageContent = '[Error mengunduh media]';
-                messageType = 'error';
-            }
-        } else if (message.type === 'location') {
-            messageType = 'location';
-            messageContent = `Lokasi: ${message.location.latitude}, ${message.location.longitude}`;
-        } else if (message.type === 'vcard') {
-            messageType = 'contact';
-            messageContent = '[Kontak]';
-        }
-
-        // Skip pesan kosong tanpa media
-        if (!messageContent && !mediaUrl) {
-            console.log('⚠️ Pesan kosong tanpa konten, diabaikan');
+        if (!message.from.endsWith('@c.us') || message.fromMe) {
             return;
         }
 
-        const messageData = {
-            fromNumber: fromNumber,
-            message: messageContent,
-            direction: 'in',
-            timestamp: new Date().toISOString(),
-            messageType: messageType,
-            mediaUrl: mediaUrl,
-            mediaData: mediaData ? JSON.stringify(mediaData) : null,
-            isRead: false
-        };
-
-        // Simpan ke database dengan kolom mediaData
-        const insertQuery = `
-            INSERT INTO chats (fromNumber, message, direction, timestamp, messageType, mediaUrl, mediaData, isRead)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `;
+        const fromNumber = message.from.replace('@c.us', '');
         
-        db.run(insertQuery, [
-            messageData.fromNumber, messageData.message, messageData.direction,
-            messageData.timestamp, messageData.messageType, messageData.mediaUrl, 
-            messageData.mediaData, messageData.isRead
-        ], function(err) {
+        // --- AWAL PERBAIKAN UTAMA ---
+        // Langkah 1: Cek apakah nomor ini ada di history
+        db.get("SELECT id FROM chats WHERE fromNumber = ? AND status = 'history' LIMIT 1", [fromNumber], (err, row) => {
             if (err) {
-                console.error('❌ Error menyimpan pesan masuk:', err);
+                console.error("Error saat memeriksa status history:", err);
                 return;
             }
-            
-            const completeMessageData = { 
-                id: this.lastID, 
-                ...messageData,
-                mediaData: mediaData // Kirim sebagai object, bukan JSON string
-            };
-            
-            // Emit ke frontend
-            io.emit('newIncomingMessage', completeMessageData);
-            console.log(`✅ Pesan (${messageType}) berhasil disimpan dan dikirim ke frontend`);
+
+            // Jika ditemukan di history, 'bangunkan' seluruh percakapan
+            if (row) {
+                console.log(`[LOGIC] Pesan masuk dari nomor di history (${fromNumber}). Mengaktifkan kembali seluruh percakapan.`);
+                db.run("UPDATE chats SET status = 'active' WHERE fromNumber = ?", [fromNumber], (updateErr) => {
+                    if (updateErr) {
+                        console.error("Gagal mengaktifkan kembali percakapan:", updateErr);
+                    } else {
+                        console.log(`[LOGIC] Percakapan untuk ${fromNumber} berhasil diaktifkan kembali.`);
+                        // Lanjutkan untuk menyimpan pesan baru setelah status diupdate
+                        saveNewMessage(message);
+                    }
+                });
+            } else {
+                // Jika tidak ada di history, langsung simpan pesan baru
+                saveNewMessage(message);
+            }
         });
+        // --- AKHIR PERBAIKAN UTAMA ---
 
     } catch (error) {
-        console.error('❌ Error handling incoming message:', error);
+        console.error('❌ Error global di message handler:', error);
     }
 });
+
+// Fungsi pembantu untuk menyimpan pesan (agar tidak duplikat kode)
+async function saveNewMessage(message) {
+    const fromNumber = message.from.replace('@c.us', '');
+    let messageContent = message.body || '';
+    let messageType = 'chat';
+    let mediaUrl = null;
+    let mediaData = null;
+
+    if (message.hasMedia) {
+        try {
+            const media = await message.downloadMedia();
+            if (media && media.data) {
+                const mimeToExt = { 'image/jpeg': '.jpg', 'image/png': '.png', 'video/mp4': '.mp4', 'application/pdf': '.pdf' };
+                const extension = mimeToExt[media.mimetype] || '.dat';
+                const fileName = `${Date.now()}_${fromNumber}${extension}`;
+                const filePath = path.join(mediaDir, fileName);
+                fs.writeFileSync(filePath, Buffer.from(media.data, 'base64'));
+                mediaUrl = `/media/${fileName}`;
+
+                if (media.mimetype.startsWith('image/')) messageType = 'image';
+                else if (media.mimetype.startsWith('video/')) messageType = 'video';
+                else messageType = 'document';
+
+                messageContent = message.body || `[${messageType}]`;
+                mediaData = { filename: media.filename || fileName, mimetype: media.mimetype, size: media.data.length, url: mediaUrl };
+            }
+        } catch (mediaError) {
+            console.error('❌ Error mengunduh media:', mediaError);
+        }
+    }
+
+    if (!messageContent && !mediaUrl) return;
+
+    const messageData = {
+        fromNumber: fromNumber,
+        message: messageContent,
+        direction: 'in',
+        timestamp: new Date().toISOString(),
+        messageType: messageType,
+        mediaUrl: mediaUrl,
+        mediaData: mediaData ? JSON.stringify(mediaData) : null,
+        isRead: false,
+        status: 'active'
+    };
+
+    const insertQuery = `
+        INSERT INTO chats (fromNumber, message, direction, timestamp, messageType, mediaUrl, mediaData, isRead, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    
+    db.run(insertQuery, [
+        messageData.fromNumber, messageData.message, messageData.direction,
+        messageData.timestamp, messageData.messageType, messageData.mediaUrl, 
+        messageData.mediaData, messageData.isRead, messageData.status
+    ], function(err) {
+        if (err) {
+            console.error('❌ Error menyimpan pesan masuk:', err);
+            return;
+        }
+        
+        const completeMessageData = { id: this.lastID, ...messageData, mediaData: mediaData };
+        io.emit('newIncomingMessage', completeMessageData);
+        console.log(`✅ Pesan dari ${fromNumber} berhasil disimpan dengan status 'active'`);
+    });
+}
 
 client.on("auth_failure", (msg) => {
     console.error("Gagal autentikasi WhatsApp:", msg);
