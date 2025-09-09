@@ -8,6 +8,23 @@ const { MessageMedia } = require('whatsapp-web.js'); // Import MessageMedia
 function createChatsRouter(db, whatsappClient, io) {
     const router = express.Router();
     
+    // --- Multer setup untuk menyimpan media chat ---
+    const uploadDir = path.join(__dirname, '..', 'uploads', 'chat_media');
+    fs.mkdirSync(uploadDir, { recursive: true });
+
+    const storage = multer.diskStorage({
+        destination: (req, file, cb) => cb(null, uploadDir),
+        filename: (req, file, cb) => {
+            const ext = path.extname(file.originalname);
+            const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+            cb(null, uniqueName);
+        }
+    });
+
+    const upload = multer({
+        storage,
+        limits: { fileSize: 50 * 1024 * 1024 } // batas 50MB, ubah sesuai kebutuhan
+    });
 
     // Endpoint untuk mendapatkan daftar percakapan unik dengan info kontak
     router.get('/conversations', (req, res) => {
@@ -198,6 +215,81 @@ function createChatsRouter(db, whatsappClient, io) {
                 message: 'Gagal mengirim pesan',
                 details: error.message 
             });
+        }
+    });
+
+    // NEW: Endpoint untuk mengirim media (foto/video/pdf)
+    router.post('/send-media', upload.single('media'), async (req, res) => {
+        const to = req.body.to;
+        const caption = req.body.caption || '';
+
+        if (!to || !req.file) {
+            // hapus file jika ada tapi parameter tidak lengkap
+            if (req.file && req.file.path) fs.unlink(req.file.path, () => {});
+            return res.status(400).json({ success: false, message: 'Nomor tujuan dan file harus disediakan' });
+        }
+
+        try {
+            if (!whatsappClient || !whatsappClient.info) {
+                // cleanup file
+                fs.unlink(req.file.path, () => {});
+                return res.status(500).json({ success: false, message: 'WhatsApp client tidak tersedia atau tidak terhubung' });
+            }
+
+            const formattedNumber = to.includes('@c.us') ? to : `${to}@c.us`;
+            const filePath = req.file.path;
+
+            const media = MessageMedia.fromFilePath(filePath);
+
+            // Kirim pesan media lewat whatsapp-web.js
+            await whatsappClient.sendMessage(formattedNumber, media, { caption });
+
+            // Simpan info file di kolom message sebagai JSON string (sesuaikan jika DB punya kolom khusus)
+            const messageObj = {
+                filename: req.file.filename,
+                originalname: req.file.originalname,
+                mimetype: req.file.mimetype,
+                size: req.file.size,
+                path: filePath,
+                caption
+            };
+
+            const dbResult = await new Promise((resolve, reject) => {
+                const timestamp = new Date().toISOString();
+                const query = `
+                    INSERT INTO chats (fromNumber, message, direction, timestamp, messageType, isRead)
+                    VALUES (?, ?, 'out', ?, 'media', TRUE)
+                `;
+
+                db.run(query, [to, JSON.stringify(messageObj), timestamp], function(err) {
+                    if (err) {
+                        console.error('Error menyimpan pesan media keluar:', err);
+                        return reject(new Error('Media terkirim tapi gagal disimpan ke database'));
+                    }
+                    resolve({ id: this.lastID, timestamp: timestamp });
+                });
+            });
+
+            const messageData = {
+                id: dbResult.id,
+                fromNumber: to,
+                message: messageObj,
+                direction: 'out',
+                timestamp: dbResult.timestamp,
+                messageType: 'media',
+                isRead: true
+            };
+
+            io.emit('messageSent', messageData);
+
+            // Balas response sukses (file tetap disimpan di server uploads untuk audit/preview)
+            res.json({ success: true, message: 'Media berhasil dikirim dan disimpan', data: messageData });
+
+        } catch (error) {
+            console.error('Error mengirim media:', error);
+            // cleanup file jika gagal
+            if (req.file && req.file.path) fs.unlink(req.file.path, () => {});
+            res.status(500).json({ success: false, message: 'Gagal mengirim media', details: error.message });
         }
     });
 
