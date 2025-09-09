@@ -527,9 +527,63 @@
 .chat-selected-file .thumb { width:36px; height:36px; object-fit:cover; border-radius:6px; }
 .chat-selected-file .remove { border:none; background:#eee; border-radius:50%; width:24px; height:24px; cursor:pointer; }
 
+.chat-tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 8px;
+}
+
+.chat-tab-button {
+    flex: 1;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: #6c757d;
+    transition: all 0.2s ease-in-out;
+    border-bottom: 3px solid transparent;
+}
+
+.chat-tab-button:hover {
+    background-color: #e9ecef;
+}
+
+.chat-tab-button.active {
+    color: #007bff;
+    border-bottom: 3px solid #007bff;
+    background-color: #fff;
+}
+
 /* ========================================================== */
-/* === RESPONSIVE DESIGN UNTUK CHAT === */
+/* === GAYA UNTUK PEMISAH SESI CHAT === */
 /* ========================================================== */
+.session-separator {
+    text-align: center;
+    margin: 14px 0;
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-style: italic;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.session-separator::before,
+.session-separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.session-separator::before {
+    margin-right: .5em;
+}
+
+.session-separator::after {
+    margin-left: .5em;
+}
+
 @media (max-width: 768px) {
     #chatView {
         height: calc(100vh - 112px); /* 160 *0.7 */
