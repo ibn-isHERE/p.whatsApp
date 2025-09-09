@@ -9,64 +9,72 @@ let socket;
 let currentChatNumber = null;
 let chatConversations = [];
 let unreadCount = 0;
-let activeChatTab = 'active';
 
 // --- Bagian 1: Fungsi untuk Mengelola Tab ---
 function showForm(formId) {
-    // Sembunyikan semua container konten form dengan menghapus kelas 'active'
+    // Sembunyikan semua konten form
     document.querySelectorAll(".form-content").forEach((form) => {
         form.classList.remove("active");
+        form.classList.add("hidden");
     });
 
-    // Hapus kelas 'active' dari semua tombol tab utama
+    // Hapus kelas 'active' dari semua tombol tab
     document.querySelectorAll(".tab-button").forEach((button) => {
         button.classList.remove("active");
     });
 
-    // Ambil elemen-elemen utama yang akan diatur tampilannya
+    // Dapatkan elemen container utama
     const scheduleContainer = document.getElementById("scheduleContainer");
     const chatMainContainer = document.getElementById("chatMainContainer");
 
     if (formId === 'chat') {
-        // Tampilkan sidebar chat dengan menambahkan kelas 'active'
+        // UNTUK TAB CHAT: Tampilkan sidebar chat + area chat utama
         const chatSidebarContainer = document.getElementById("chatSidebarContainer");
         if (chatSidebarContainer) {
             chatSidebarContainer.classList.add("active");
+            chatSidebarContainer.classList.remove("hidden");
         }
 
-        // Sembunyikan container jadwal reguler
+        // Sembunyikan tabel jadwal
         if (scheduleContainer) {
             scheduleContainer.style.display = "none";
         }
 
-        // Tampilkan container utama untuk area chat
+        // Tampilkan area chat utama
         if (chatMainContainer) {
             chatMainContainer.style.display = "flex";
         }
 
-        // Muat data percakapan berdasarkan tab yang aktif (Daftar/History)
-        loadChatConversations(activeChatTab);
+        // Load chat data
+        loadChatConversations();
         updateUnreadCount();
-        
     } else {
-        // Untuk tab lainnya (bukan chat), tampilkan form yang sesuai
+        // UNTUK TAB LAINNYA: Tampilkan form yang sesuai + tabel jadwal
         const selectedForm = document.getElementById(formId + "FormContainer");
         if (selectedForm) {
             selectedForm.classList.add("active");
+            selectedForm.classList.remove("hidden");
         }
 
-        // Tampilkan kembali container jadwal reguler
+        // Tampilkan kembali tabel jadwal
         if (scheduleContainer) {
             scheduleContainer.style.display = "block";
         }
 
-        // Sembunyikan container utama area chat
+        // Sembunyikan area chat utama
         if (chatMainContainer) {
             chatMainContainer.style.display = "none";
         }
+
+        // Sembunyikan sidebar chat
+        const chatSidebarContainer = document.getElementById("chatSidebarContainer");
+        if (chatSidebarContainer) {
+            chatSidebarContainer.classList.remove("active");
+            chatSidebarContainer.classList.add("hidden");
+        }
     }
 
-    // Beri tanda 'active' pada tombol tab utama yang diklik
+    // Aktifkan tombol tab yang relevan
     const selectedTab = document.querySelector(
         `.tab-button[onclick="showForm('${formId}')"]`
     );
@@ -74,7 +82,7 @@ function showForm(formId) {
         selectedTab.classList.add("active");
     }
 
-    // Muat data spesifik jika diperlukan (misalnya, saat membuka tab Kontak)
+    // Load data spesifik berdasarkan tab
     if (formId === "contacts") {
         fetchAndRenderContacts();
     }
@@ -1958,10 +1966,10 @@ function handleNewIncomingMessage(messageData) {
     // 3. Show browser notification
     showBrowserNotification(messageData);
     
-    // 4. Reload conversations list untuk tab yang sedang aktif
-    loadChatConversations(activeChatTab);
+    // 4. Reload conversations list
+    loadChatConversations();
     
-    // 5. Jika sedang melihat chat ini, reload messages di area utama
+    // 5. Jika sedang melihat chat ini, reload messages
     if (currentChatNumber === messageData.fromNumber) {
         console.log('📱 Reloading active chat:', messageData.fromNumber);
         loadChatHistory(messageData.fromNumber);
@@ -2022,10 +2030,10 @@ async function markMessagesAsRead(fromNumber) {
 }
 
 // PERBAIKAN: Load chat conversations dengan error handling
-async function loadChatConversations(status = 'active') {
-    console.log(`📋 Memuat percakapan dengan status: ${status}...`);
+async function loadChatConversations() {
+    console.log('📋 Loading chat conversations...');
     try {
-        const response = await fetch(`/api/chats/conversations?status=${status}`);
+        const response = await fetch('/api/chats/conversations');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -2033,28 +2041,24 @@ async function loadChatConversations(status = 'active') {
         const result = await response.json();
         
         if (result.success && Array.isArray(result.data)) {
-            // Langsung gunakan data dari backend tanpa perlu mapping lagi
-            chatConversations = result.data.map(conv => ({
-                phoneNumber: conv.fromNumber,
-                contactName: conv.contactName,
-                lastMessage: conv.lastMessage,
-                lastMessageTime: conv.lastTimestamp,
-                direction: conv.direction,
-                unreadCount: conv.unreadCount || 0
-            }));
-            
+            // Ini adalah langkah kunci: mengubah 'fromNumber' menjadi 'phoneNumber'
+            chatConversations = result.data.map(conv => {
+                console.log('[DEBUG] Raw data from server:', conv); // Untuk debugging
+                return {
+                    phoneNumber: conv.fromNumber, // Membuat properti yang benar
+                    contactName: conv.contactName || conv.fromNumber,
+                    lastMessage: conv.lastMessage,
+                    lastMessageTime: conv.lastTimestamp,
+                    direction: conv.direction,
+                    unreadCount: conv.unreadCount || 0
+                };
+            });
             renderChatConversations();
-
         } else {
-            console.error('❌ Format data dari server tidak valid:', result.message || result);
-            chatConversations = []; // Kosongkan data jika error
-            renderChatConversations(); // Tampilkan pesan "tidak ada percakapan"
+            console.error('❌ Invalid data format from server:', result.message || result);
         }
-        
     } catch (error) {
-        console.error('❌ Error di dalam fungsi loadChatConversations:', error);
-        chatConversations = []; // Kosongkan data jika error
-        renderChatConversations(); // Tampilkan pesan "tidak ada percakapan"
+        console.error('❌ Error in loadChatConversations:', error);
     }
 }
 
@@ -2140,32 +2144,16 @@ function initChatEventListeners() {
             if (currentChatNumber) {
                 loadChatHistory(currentChatNumber);
             }
-            loadChatConversations(activeChatTab);
+            loadChatConversations();
         });
     }
-
-    // End chat button
-    const endChatBtn = document.getElementById('endChatBtn');
-    if(endChatBtn){
-        endChatBtn.addEventListener('click', endChat);
-    }
-
-    // Event listener untuk tombol tab chat (Daftar Percakapan & History Chat)
-    document.querySelectorAll('.chat-tab-button').forEach(button => {
-        button.addEventListener('click', () => {
-            document.querySelectorAll('.chat-tab-button').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            activeChatTab = button.dataset.status;
-            loadChatConversations(activeChatTab);
-        });
-    });
 }
 
 // ===== LOAD CHAT CONVERSATIONS =====
-async function loadChatConversations(status = 'active') {
-    console.log(`📋 Loading chat conversations with status: ${status}...`);
+async function loadChatConversations() {
+    console.log('📋 Memuat percakapan...');
     try {
-        const response = await fetch(`/api/chats/conversations?status=${status}`);
+        const response = await fetch('/api/chats/conversations');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -2173,11 +2161,14 @@ async function loadChatConversations(status = 'active') {
         const result = await response.json();
         
         if (result.success && Array.isArray(result.data)) {
-            // Ini adalah langkah kunci: mengubah 'fromNumber' menjadi 'phoneNumber'
+            
+            // INI ADALAH BAGIAN PALING PENTING
+            // .map() akan membuat array baru dengan format yang benar
             chatConversations = result.data.map(conv => {
-                console.log('[DEBUG] Raw data from server:', conv); // Untuk debugging
+                // 'conv' adalah objek mentah dari server dengan 'fromNumber'
+                // Kita kembalikan objek baru dengan properti 'phoneNumber'
                 return {
-                    phoneNumber: conv.fromNumber, // Membuat properti yang benar
+                    phoneNumber: conv.fromNumber, // <-- Kunci perbaikannya ada di sini
                     contactName: conv.contactName || conv.fromNumber,
                     lastMessage: conv.lastMessage,
                     lastMessageTime: conv.lastTimestamp,
@@ -2185,42 +2176,55 @@ async function loadChatConversations(status = 'active') {
                     unreadCount: conv.unreadCount || 0
                 };
             });
-            renderChatConversations();
+            
+            renderChatConversations(); // Kirim data yang sudah dipetakan untuk dirender
+
         } else {
-            console.error('❌ Invalid data format from server:', result.message || result);
+            console.error('❌ Format data dari server tidak valid:', result.message || result);
         }
+        
     } catch (error) {
-        console.error('❌ Error in loadChatConversations:', error);
+        console.error('❌ Error di dalam fungsi loadChatConversations:', error);
     }
 }
 
 // ===== RENDER CHAT CONVERSATIONS =====
 function renderChatConversations() {
+    console.log('🎨 Rendering chat conversations...');
     const chatList = document.getElementById('chatList');
     if (!chatList) return;
 
     chatList.innerHTML = '';
     
     if (chatConversations.length === 0) {
-        chatList.innerHTML = '<div class="no-conversations">Tidak ada percakapan.</div>';
+        chatList.innerHTML = '<div class="no-conversations">Belum ada percakapan</div>';
         return;
     }
     
     chatConversations.forEach((conversation) => {
+        console.log('[DEBUG] Rendering item with data:', conversation);
+
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         if (conversation.unreadCount > 0) {
             chatItem.classList.add('unread');
         }
         
+        // Set data attribute untuk identifikasi
         chatItem.setAttribute('data-phone-number', conversation.phoneNumber);
         
-        const lastMessageTime = new Date(conversation.lastMessageTime).toLocaleString('id-ID', { 
-            hour: '2-digit', 
-            minute: '2-digit',
-            day: '2-digit',
-            month: '2-digit'
-        });
+        let lastMessageTime = 'Tanpa waktu';
+        if (conversation.lastMessageTime) {
+            const dateObj = new Date(conversation.lastMessageTime);
+            if (!isNaN(dateObj)) {
+                lastMessageTime = dateObj.toLocaleString('id-ID', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    day: '2-digit',
+                    month: '2-digit'
+                });
+            }
+        }
         
         chatItem.innerHTML = `
             <div class="chat-item-header">
@@ -2228,19 +2232,23 @@ function renderChatConversations() {
                 <div class="chat-time">${lastMessageTime}</div>
             </div>
             <div class="chat-preview">
-                ${conversation.lastMessage}
+                ${conversation.lastMessage || ''}
                 ${conversation.unreadCount > 0 ? `<span class="unread-count">${conversation.unreadCount}</span>` : ''}
             </div>
         `;
         
         chatItem.addEventListener('click', () => {
-            selectConversation(conversation.phoneNumber, conversation.contactName);
+            if (conversation.phoneNumber) {
+                selectConversation(conversation.phoneNumber, conversation.contactName);
+            } else {
+                console.error('❌ GAGAL: Nomor telepon tidak ditemukan!', conversation);
+                Swal.fire('Error', 'Gagal membuka percakapan, nomor telepon tidak ditemukan.', 'error');
+            }
         });
         
         chatList.appendChild(chatItem);
     });
 }
-
 
 // ===== FILTER CHAT CONVERSATIONS =====
 function filterChatConversations(searchTerm) {
@@ -2334,69 +2342,67 @@ function renderChatMessages(messages) {
     }
     
     messages.forEach(message => {
-        let messageDiv;
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${message.direction === 'in' ? 'incoming' : 'outgoing'}`;
+        
+        const messageTime = new Date(message.timestamp).toLocaleString('id-ID', {
+            hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit'
+        });
 
-        if (message.messageType === 'system') {
-            messageDiv = document.createElement('div');
-            messageDiv.className = 'session-separator';
-            messageDiv.textContent = message.message;
-        } else {
-            messageDiv = document.createElement('div');
-            messageDiv.className = `message ${message.direction === 'in' ? 'incoming' : 'outgoing'}`;
-            
-            const messageTime = new Date(message.timestamp).toLocaleString('id-ID', {
-                hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit'
-            });
+        let messageBubbleContent = '';
 
-            let messageBubbleContent = '';
+        // Tentukan konten bubble berdasarkan tipe pesan
+        switch (message.messageType) {
+            case 'image':
+                messageBubbleContent = `
+                    <div class="message-media-container" onclick="showMediaModal('${message.mediaUrl}', 'image')">
+                        <img src="${message.mediaUrl}" class="chat-image" alt="Gambar Terkirim">
+                    </div>
+                    ${message.message ? `<div class="message-caption">${message.message}</div>` : ''}
+                    <div class="message-time">${messageTime}</div>
+                `;
+                break;
 
-            switch (message.messageType) {
-                case 'image':
-                    messageBubbleContent = `
-                        <div class="message-media-container" onclick="showMediaModal('${message.mediaUrl}', 'image')">
-                            <img src="${message.mediaUrl}" class="chat-image" alt="Gambar Terkirim">
+            case 'video':
+                messageBubbleContent = `
+                    <div class="chat-file-link video-thumbnail" onclick="showMediaModal('${message.mediaUrl}', 'video')">
+                        <div class="file-icon"><i class="fa-solid fa-play"></i></div>
+                        <div class="file-info">
+                            <span class="chat-file-name">${message.message || 'Lihat Video'}</span>
                         </div>
-                        ${message.message ? `<div class="message-caption">${message.message}</div>` : ''}
-                        <div class="message-time">${messageTime}</div>
-                    `;
-                    break;
-                case 'video':
-                     messageBubbleContent = `
-                        <div class="chat-file-link video-thumbnail" onclick="showMediaModal('${message.mediaUrl}', 'video')">
-                            <div class="file-icon"><i class="fa-solid fa-play"></i></div>
-                            <div class="file-info">
-                                <span class="chat-file-name">${message.message || 'Lihat Video'}</span>
-                            </div>
+                    </div>
+                    <div class="message-time">${messageTime}</div>
+                `;
+                break;
+
+            case 'document':
+                messageBubbleContent = `
+                    <a href="${message.mediaUrl}" target="_blank" download class="chat-file-link">
+                        <div class="file-icon"><i class="fa-solid fa-file-arrow-down"></i></div>
+                        <div class="file-info">
+                            <span class="chat-file-name">${message.message || 'Unduh Dokumen'}</span>
                         </div>
-                        <div class="message-time">${messageTime}</div>
-                    `;
-                    break;
-                case 'document':
-                    messageBubbleContent = `
-                        <a href="${message.mediaUrl}" target="_blank" download class="chat-file-link">
-                            <div class="file-icon"><i class="fa-solid fa-file-arrow-down"></i></div>
-                            <div class="file-info">
-                                <span class="chat-file-name">${message.message || 'Unduh Dokumen'}</span>
-                            </div>
-                        </a>
-                        <div class="message-time">${messageTime}</div>
-                    `;
-                    break;
-                default:
-                    messageBubbleContent = `
-                        ${message.message}
-                        <div class="message-time">${messageTime}</div>
-                    `;
-                    break;
-            }
-            messageDiv.innerHTML = `<div class="message-bubble">${messageBubbleContent}</div>`;
+                    </a>
+                    <div class="message-time">${messageTime}</div>
+                `;
+                break;
+
+            default: // 'chat' atau tipe lainnya
+                messageBubbleContent = `
+                    ${message.message}
+                    <div class="message-time">${messageTime}</div>
+                `;
+                break;
         }
         
+        messageDiv.innerHTML = `<div class="message-bubble">${messageBubbleContent}</div>`;
         chatMessages.appendChild(messageDiv);
     });
     
+    // Auto-scroll ke pesan terbaru
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
+
 
 // ==========================================================
 // === FUNGSI-FUNGSI BARU UNTUK MODAL MEDIA ===
@@ -2455,116 +2461,51 @@ function closeMediaModal() {
 // ===== SEND REPLY =====
 async function sendReply() {
     const replyInput = document.getElementById('replyInput');
-    const chatFileInput = document.getElementById('chatFileInput');
     const sendBtn = document.getElementById('sendReplyBtn');
-
-    if (!currentChatNumber) {
-        Swal.fire('Error', 'Pilih percakapan terlebih dahulu.', 'error');
-        return;
-    }
-
-    const caption = replyInput.value.trim();
-    const file = chatFileInput.files[0];
-    const hasFile = !!file;
-
-    if (!caption && !hasFile) {
-        Swal.fire('Peringatan', 'Ketik pesan atau pilih file terlebih dahulu.', 'warning');
-        return;
-    }
-
-    // Disable UI
+    
+    if (!replyInput || !currentChatNumber) return;
+    
+    const message = replyInput.value.trim();
+    if (!message) return;
+    
+    // Disable input while sending
     replyInput.disabled = true;
-    chatFileInput.disabled = true;
     sendBtn.disabled = true;
-
+    
     try {
-        let response;
-        if (hasFile) {
-            // Logika untuk mengirim media
-            const formData = new FormData();
-            formData.append('to', currentChatNumber);
-            formData.append('caption', caption);
-            formData.append('media', file); // Nama field harus 'media'
-
-            response = await fetch('/api/chats/send-media', {
-                method: 'POST',
-                body: formData
-            });
-
-        } else {
-            // Logika untuk mengirim teks biasa
-            response = await fetch('/api/chats/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ to: currentChatNumber, message: caption })
-            });
-        }
-
-        const result = await response.json();
-        if (!response.ok || !result.success) {
-            throw new Error(result.message || 'Gagal mengirim pesan.');
-        }
+        const response = await fetch('/api/chats/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+    to: currentChatNumber,
+    message: message
+})
+        });
         
-        // Reset UI setelah berhasil
-        replyInput.value = '';
-        chatFileInput.value = '';
-        const selectedFilePreviewEl = document.querySelector('.chat-selected-file');
-        if (selectedFilePreviewEl) selectedFilePreviewEl.remove();
-
-        // Muat ulang history untuk menampilkan pesan/gambar yang baru dikirim
-        loadChatHistory(currentChatNumber);
-        // Muat ulang daftar percakapan untuk memperbarui pesan terakhir
-        loadChatConversations(activeChatTab);
-
-    } catch (e) {
-        console.error(e);
-        Swal.fire('Error', e.message, 'error');
+        const result = await response.json();
+        
+        if (result.success) {
+            // Clear input
+            replyInput.value = '';
+            
+            // Reload chat history
+            loadChatHistory(currentChatNumber);
+            
+            // Reload conversations to update preview
+            loadChatConversations();
+        } else {
+            Swal.fire('Error', result.message || 'Gagal mengirim pesan', 'error');
+        }
+    } catch (error) {
+        console.error('Error sending reply:', error);
+        Swal.fire('Error', 'Gagal mengirim pesan', 'error');
     } finally {
-        // Re-enable UI
+        // Re-enable input
         replyInput.disabled = false;
-        chatFileInput.disabled = false;
         sendBtn.disabled = false;
         replyInput.focus();
-    }
-}
-
-
-async function endChat() {
-    if (!currentChatNumber) {
-        Swal.fire('Peringatan', 'Pilih percakapan terlebih dahulu.', 'warning');
-        return;
-    }
-
-    const result = await Swal.fire({
-        title: 'Akhiri Sesi Chat?',
-        text: 'Percakapan ini akan dipindahkan ke History Chat.',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Ya, Akhiri',
-        cancelButtonText: 'Batal'
-    });
-
-    if (result.isConfirmed) {
-        try {
-            const response = await fetch(`/api/chats/end-chat/${currentChatNumber}`, {
-                method: 'PUT'
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                Swal.fire('Berhasil', 'Sesi chat telah diakhiri.', 'success');
-                currentChatNumber = null;
-                document.getElementById('activeContactName').textContent = 'Pilih percakapan';
-                document.getElementById('activeContactNumber').textContent = '';
-                document.getElementById('chatMessages').innerHTML = '<div class="no-chat-selected"><i class="fa-solid fa-comments"></i><p>Pilih percakapan untuk mulai chat</p></div>';
-                document.getElementById('chatInputArea').style.display = 'none';
-                loadChatConversations(activeChatTab);
-            } else {
-                Swal.fire('Gagal', data.message, 'error');
-            }
-        } catch (error) {
-            Swal.fire('Error', 'Terjadi kesalahan saat menghubungi server.', 'error');
-        }
     }
 }
 
@@ -2730,10 +2671,10 @@ function handleNewIncomingMessage(messageData) {
 }
 
 // Update fungsi loadChatConversations untuk bekerja dengan sidebar
-async function loadChatConversations(status = 'active') {
-    console.log(`[Frontend] Meminta percakapan dengan status: ${status}...`);
+async function loadChatConversations() {
+    console.log('📋 Memuat percakapan...');
     try {
-        const response = await fetch(`/api/chats/conversations?status=${status}`);
+        const response = await fetch('/api/chats/conversations');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -2741,30 +2682,30 @@ async function loadChatConversations(status = 'active') {
         const result = await response.json();
         
         if (result.success && Array.isArray(result.data)) {
-            console.log("[Frontend] Data diterima dari backend:", result.data);
+            // Transformasi data untuk kompatibilitas dengan layout baru
+            chatConversations = result.data.map(conv => {
+                return {
+                    phoneNumber: conv.fromNumber,
+                    contactName: conv.contactName || conv.fromNumber,
+                    lastMessage: conv.lastMessage,
+                    lastMessageTime: conv.lastTimestamp,
+                    direction: conv.direction,
+                    unreadCount: conv.unreadCount || 0
+                };
+            });
             
-            // Perbaikan: Mapping data dari backend ke format yang dibutuhkan frontend
-            chatConversations = result.data.map(conv => ({
-                phoneNumber: conv.fromNumber,
-                contactName: conv.contactName || conv.fromNumber, // Fallback jika nama kontak tidak ada
-                lastMessage: conv.lastMessage || '', // Fallback untuk pesan kosong
-                lastMessageTime: conv.lastTimestamp,
-                direction: conv.direction,
-                unreadCount: conv.unreadCount || 0
-            }));
-            
-            renderChatConversations();
+            // Hanya render jika sedang di tab chat
+            const chatSidebarContainer = document.getElementById("chatSidebarContainer");
+            if (chatSidebarContainer && !chatSidebarContainer.classList.contains("hidden")) {
+                renderChatConversations();
+            }
 
         } else {
-            console.error('[Frontend] Format data dari server tidak valid:', result.message || result);
-            chatConversations = [];
-            renderChatConversations();
+            console.error('❌ Format data dari server tidak valid:', result.message || result);
         }
         
     } catch (error) {
-        console.error('[Frontend] Error di dalam fungsi loadChatConversations:', error);
-        chatConversations = [];
-        renderChatConversations();
+        console.error('❌ Error di dalam fungsi loadChatConversations:', error);
     }
 }
 
