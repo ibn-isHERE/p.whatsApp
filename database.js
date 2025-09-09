@@ -78,7 +78,7 @@ db.serialize(() => {
         }
     );
 
-    // 4. Tabel untuk chat/customer service (UPDATED WITH MEDIA SUPPORT)
+     // 4. Tabel untuk chat/customer service (UPDATED WITH MEDIA SUPPORT)
     db.run(
         `CREATE TABLE IF NOT EXISTS chats (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -90,7 +90,9 @@ db.serialize(() => {
             mediaUrl TEXT,
             mediaData TEXT,
             isRead BOOLEAN DEFAULT FALSE,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            status TEXT DEFAULT 'active',
+            session_id TEXT
         )`,
         (err) => {
             if (err) {
@@ -130,11 +132,12 @@ db.serialize(() => {
                     
                     // ✅ PERBAIKAN UTAMA: Tambah kolom mediaData untuk menyimpan metadata media
                     addColumnIfNotExists('mediaData', "mediaData TEXT NULL");
+                    addColumnIfNotExists('status', "status TEXT DEFAULT 'active'");
+                    addColumnIfNotExists('session_id', "session_id TEXT");
                 });
             }
         }
     );
-
     // 5. Buat index untuk performa yang lebih baik
     db.run("CREATE INDEX IF NOT EXISTS idx_chats_fromNumber ON chats(fromNumber)", (err) => {
         if (err) {
