@@ -1,4 +1,8 @@
 /* ---- Base Styles & Layout ---- */
+html {
+  font-size: 70%; /* semua rem/em akan ikut mengecil jadi 70% */
+}
+
 body {
     font-family: 'Segoe UI', Arial, sans-serif; /* A slightly more modern font */
     background-color: #f8f9fa; /* Lighter background for a cleaner look */
@@ -11,31 +15,31 @@ body {
 
 main {
     flex: 1;
-    padding-top: 80px; /* Space for fixed navbar */
+    padding-top: 56px; /* 80 * 0.7 */
     display: flex;
     flex-direction: column;
 }
 
 .app-header {
     text-align: center;
-    margin-top: 30px; /* More space above the main title */
-    margin-bottom: 30px;
+    margin-top: 21px; /* 30 * 0.7 */
+    margin-bottom: 21px; /* 30 * 0.7 */
 }
 
 .app-header h1 {
-    font-size: 2.5rem; /* Slightly larger title */
+    font-size: 2.5rem; /* tetap rem: html scaling mengurus ukuran */
     font-weight: 700;
     color: #003366; /* Matching navbar color for prominence */
-    letter-spacing: -0.5px; /* Tighter letter spacing */
+    letter-spacing: -0.35px; /* -0.5 * 0.7 */
 }
 
 .main-content {
     flex: 1;
     display: flex;
-    gap: 25px; /* Increased gap between columns */
+    gap: 17.5px; /* 25 * 0.7 */
     width: 90%;
-    margin: 0 auto 40px auto; /* Centered content */
-    padding: 0 25px; /* Padding on sides for smaller screens */
+    margin: 0 auto 28px auto; /* 40 * 0.7 */
+    padding: 0 17.5px; /* 25 * 0.7 */
     box-sizing: border-box;
     align-items: flex-start; /* Align items to the start of the cross axis */
 }
@@ -43,7 +47,7 @@ main {
 /* ---- Navbar Styles ---- */
 .navbar {
     background-color: #003366;
-    padding: 10px 24px;
+    padding: 7px 16.8px; /* 10px,24px * 0.7 */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -51,9 +55,9 @@ main {
     top: 0;
     left: 0;
     right: 0;
-    height: 70px; /* Taller navbar */
+    height: 49px; /* 70 * 0.7 */
     z-index: 1000; /* Higher z-index to ensure it stays on top */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* More prominent shadow */
+    box-shadow: 0 2.8px 5.6px rgba(0, 0, 0, 0.15); /* scaled */
 }
 
 .navbar-left {
@@ -62,15 +66,15 @@ main {
 }
 
 .navbar-left img {
-    width: 90px; /* Slightly larger logo */
-    height: 70px;
-    margin-right: 15px;
-    margin-left: 50px; /* Adjusted margin for better centering */
+    width: 63px; /* 90 * 0.7 */
+    height: 49px; /* 70 * 0.7 */
+    margin-right: 10.5px; /* 15 * 0.7 */
+    margin-left: 35px; /* 50 * 0.7 */
 }
 
 .navbar-text {
     color: white;
-    font-size: 24px; /* Larger text */
+    font-size: 16.8px; /* 24 * 0.7 */
     font-weight: 700; /* Bolder text */
     white-space: nowrap;
     font-style: italic;
@@ -80,16 +84,16 @@ main {
 /* ---- Form Container (Left Column) ---- */
 .form-container {
     background: white;
-    padding: 30px;
-    border-radius: 15px; /* More rounded corners */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Softer, larger shadow */
+    padding: 21px; /* 30 * 0.7 */
+    border-radius: 10.5px; /* 15 * 0.7 */
+    box-shadow: 0 7px 21px rgba(0, 0, 0, 0.1); /* scaled */
     flex-shrink: 0;
-    flex-basis: 450px;
+    flex-basis: 315px; /* 450 * 0.7 */
     flex-grow: 0;
     height: auto;
     position: sticky;
-    top: 100px; /* Adjusted sticky position below navbar */
-    max-height: calc(100vh - 120px); /* Account for top/bottom margins */
+    top: 70px; /* 100 * 0.7 */
+    max-height: calc(100vh - 84px); /* 120 * 0.7 */
     overflow-y: auto;
     box-sizing: border-box;
     border: 1px solid #e0e0e0; /* Subtle border */
@@ -97,17 +101,17 @@ main {
 
 .form-container h2 {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 21px; /* 30 * 0.7 */
     font-weight: 700;
     color: #003366;
-    font-size: 1.8rem;
+    font-size: 1.8rem; /* tetap rem */
 }
 
 /* Tambahan CSS untuk tab button di form container */
 .tabs {
     display: flex;
     justify-content: center;
-    margin-bottom: 25px;
+    margin-bottom: 17.5px; /* 25 * 0.7 */
     border-bottom: 2px solid #e9ecef; /* Garis abu-abu tipis di bawah semua tab */
 }
 
@@ -115,9 +119,9 @@ main {
 .tab-button {
     background-color: transparent;
     border: none;
-    padding: 10px 20px;
+    padding: 7px 14px; /* 10px,20px *0.7 */
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1rem; /* tetap rem */
     font-weight: 600;
     color: #6c757d; 
     transition: color 0.3s ease;
@@ -143,8 +147,8 @@ main {
 
 form label {
     display: block;
-    margin-top: 20px;
-    margin-bottom: 5px; /* Closer to the input */
+    margin-top: 14px; /* 20 * 0.7 */
+    margin-bottom: 3.5px; /* 5 * 0.7 */
     font-weight: 600;
     color: #444;
     user-select: none;
@@ -155,14 +159,14 @@ form input[type="datetime-local"],
 form textarea,
 form select {
     width: 100%;
-    padding: 12px 15px;
+    padding: 8.4px 10.5px; /* 12px,15px *0.7 */
     border: 1px solid #dcdcdc; /* Lighter border */
-    border-radius: 10px; /* More rounded inputs */
-    font-size: 1rem;
+    border-radius: 7px; /* 10 * 0.7 */
+    font-size: 1rem; /* tetap rem */
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
     box-sizing: border-box;
     resize: vertical;
-    min-height: 40px; /* Minimum height for inputs */
+    min-height: 28px; /* 40 * 0.7 */
     background-color: white;
 }
 
@@ -172,19 +176,19 @@ form textarea:focus,
 form select:focus {
     border-color: #007bff;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Focus ring effect */
+    box-shadow: 0 0 0 2.1px rgba(0, 123, 255, 0.25); /* 3 *0.7 */
 }
 
 textarea {
-    min-height: 100px; /* Standard textarea height */
+    min-height: 70px; /* 100 *0.7 */
 }
 
 .select-all-container {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-top: 15px;
-    margin-bottom: 10px;
+    gap: 7px; /* 10 *0.7 */
+    margin-top: 10.5px; /* 15 *0.7 */
+    margin-bottom: 7px; /* 10 *0.7 */
     font-weight: 600;
     color: #444;
 }
@@ -195,17 +199,17 @@ textarea {
 }
 
 #contactSearch {
-    margin-bottom: 10px;
-    margin-top: 8px; /* Adjusted margin */
+    margin-bottom: 7px; /* 10 *0.7 */
+    margin-top: 5.6px; /* 8 *0.7 */
 }
 
 .contact-checklist-box {
-    max-height: 200px; /* Slightly taller contact list */
+    max-height: 140px; /* 200 *0.7 */
     overflow-y: auto;
     border: 1px solid #dcdcdc;
-    border-radius: 10px;
-    padding: 10px 15px;
-    margin-top: 10px;
+    border-radius: 7px; /* 10 *0.7 */
+    padding: 7px 10.5px; /* 10px,15px *0.7 */
+    margin-top: 7px; /* 10 *0.7 */
     background-color: #ffffff; /* White background for list */
     box-sizing: border-box;
 }
@@ -213,13 +217,13 @@ textarea {
 .contact-checklist-box label {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 7px; /* 10 *0.7 */
     cursor: pointer;
-    font-size: 0.95rem; /* Slightly larger font */
+    font-size: 0.95rem; /* tetap rem */
     color: #333;
     transition: background-color 0.2s ease;
-    padding: 8px 10px; /* More padding */
-    border-radius: 8px; /* More rounded labels */
+    padding: 5.6px 7px; /* 8px,10px *0.7 */
+    border-radius: 5.6px; /* 8 *0.7 */
     user-select: none;
 }
 
@@ -235,11 +239,11 @@ textarea {
 .select-all-container input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 20px; /* Larger checkbox */
-    height: 20px;
+    width: 14px; /* 20 *0.7 */
+    height: 14px;
     border: 2px solid #007bff;
-    border-radius: 6px; /* More rounded checkbox */
-    margin-right: 15px;
+    border-radius: 4.2px; /* 6 *0.7 */
+    margin-right: 10.5px; /* 15 *0.7 */
     position: relative;
     cursor: pointer;
     transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
@@ -260,23 +264,23 @@ textarea {
     position: absolute;
     top: -1px; /* Adjust checkmark position */
     left: 0;
-    font-size: 14px; /* Adjust checkmark size */
+    font-size: 9.8px; /* 14 *0.7 */
     font-weight: bold;
     user-select: none;
     text-align: center;
     width: 100%;
-    line-height: 20px; /* Align checkmark vertically */
+    line-height: 14px; /* 20 *0.7 */
 }
 
 .file-upload-section {
-    margin-top: 20px;
+    margin-top: 14px; /* 20 *0.7 */
 }
 
 .file-upload-container {
-    margin-top: 10px;
+    margin-top: 7px; /* 10 *0.7 */
     border: 2px dashed #a0a0a0; /* Darker dashed border */
-    padding: 15px;
-    border-radius: 10px;
+    padding: 10.5px; /* 15 *0.7 */
+    border-radius: 7px; /* 10 *0.7 */
     text-align: center;
     cursor: pointer;
     transition: background-color 0.2s ease, border-color 0.2s ease;
@@ -293,7 +297,7 @@ textarea {
 
 .file-upload-label {
     display: block;
-    padding: 5px 0;
+    padding: 3.5px 0; /* 5 *0.7 */
     cursor: pointer;
     color: #007bff;
     font-weight: 600;
@@ -302,7 +306,7 @@ textarea {
 .file-name {
     font-size: 0.9em;
     color: #666;
-    margin-top: 8px;
+    margin-top: 5.6px; /* 8 *0.7 */
     word-break: break-all; /* Ensure long file names wrap */
 }
 
@@ -310,8 +314,8 @@ textarea {
 #keepFileCheckboxDiv {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 7px; /* 10 *0.7 */
+    margin-top: 14px; /* 20 *0.7 */
     font-weight: 600;
     color: #444;
 }
@@ -326,10 +330,10 @@ textarea {
 #keepFileCheckboxDiv input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 14px; /* 20 *0.7 */
+    height: 14px;
     border: 2px solid #007bff;
-    border-radius: 6px;
+    border-radius: 4.2px; /* 6 *0.7 */
     position: relative;
     cursor: pointer;
     transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
@@ -348,12 +352,12 @@ textarea {
     position: absolute;
     top: -1px;
     left: 0;
-    font-size: 14px;
+    font-size: 9.8px; /* 14 *0.7 */
     font-weight: bold;
     user-select: none;
     text-align: center;
     width: 100%;
-    line-height: 20px;
+    line-height: 14px; /* 20 *0.7 */
 }
 /* --- Akhir Tambahan CSS --- */
 
@@ -361,29 +365,29 @@ form button {
     background-color: #007bff; 
     color: white;
     border: none;
-    margin-top: 30px;
+    margin-top: 21px; /* 30 *0.7 */
     cursor: pointer;
-    font-size: 1.1rem;
-    padding: 14px 20px;
-    border-radius: 10px;
+    font-size: 1.1rem; /* tetap rem */
+    padding: 9.8px 14px; /* 14px,20px *0.7 */
+    border-radius: 7px; /* 10 *0.7 */
     font-weight: 600;
     width: 100%;
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+    box-shadow: 0 2.8px 7px rgba(40, 167, 69, 0.2); /* scaled */
 }
 
 form button:hover {
     background-color: #05529f;
-    transform: translateY(-2px); /* Slight lift on hover */
-    box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
+    transform: translateY(-1.4px); /* -2px *0.7 */
+    box-shadow: 0 4.2px 10.5px rgba(40, 167, 69, 0.3); /* scaled */
 }
 
 /* ---- Schedule Container (Right Column) ---- */
 .schedule-container {
     background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 21px; /* 30 *0.7 */
+    border-radius: 10.5px; /* 15 *0.7 */
+    box-shadow: 0 7px 21px rgba(0, 0, 0, 0.1);
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -393,32 +397,32 @@ form button:hover {
 
 .schedule-container h2 {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 17.5px; /* 25 *0.7 */
     font-weight: 700;
     color: #003366;
-    font-size: 1.8rem;
+    font-size: 1.8rem; /* tetap rem */
 }
 
 /* --- Filter Buttons --- */
 .filter-buttons {
     display: flex;
     justify-content: center;
-    gap: 12px; /* Slightly more space between buttons */
-    margin-bottom: 25px; /* Space below filters */
+    gap: 8.4px; /* 12 *0.7 */
+    margin-bottom: 17.5px; /* 25 *0.7 */
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
 .filter-button {
     background-color: #e9ecef; /* Lighter grey for inactive */
     border: 1px solid #ced4da; /* Subtle border */
-    padding: 10px 20px; /* More padding */
-    border-radius: 8px; /* More rounded */
+    padding: 7px 14px; /* 10px,20px *0.7 */
+    border-radius: 5.6px; /* 8 *0.7 */
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1rem; /* tetap rem */
     font-weight: 500;
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
     flex-grow: 1; /* Allow buttons to grow */
-    max-width: 150px; /* Max width for individual buttons */
+    max-width: 105px; /* 150 *0.7 */
     text-align: center;
 }
 
@@ -431,8 +435,8 @@ form button:hover {
     background-color: #007bff; /* Primary blue for active */
     color: white;
     border-color: #007bff;
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2); /* Subtle shadow for active */
-    transform: translateY(-2px);
+    box-shadow: 0 1.4px 5.6px rgba(0, 123, 255, 0.2); /* scaled */
+    transform: translateY(-1.4px); /* -2 *0.7 */
 }
 
 /* Pembungkus tabel yang bisa digulir */
@@ -444,14 +448,14 @@ form button:hover {
     position: relative;
     margin-top: 0; /* No top margin as filters are above */
     width: 100%;
-    border-radius: 10px; /* Rounded corners for the scrollable area */
+    border-radius: 7px; /* 10 *0.7 */
     border: 1px solid #e0e0e0; /* Border for the table wrapper */
 }
 
 /* ---- Table Styles ---- */
 #scheduleTable {
     width: 100%;
-    min-width: 1000px;
+    min-width: 700px; /* 1000 *0.7 */
     border-collapse: separate; /* Use separate to allow border-radius on cells */
     border-spacing: 0; /* Remove default spacing */
 }
@@ -466,9 +470,9 @@ form button:hover {
 #scheduleTable th,
 #scheduleTable td {
     border-bottom: 1px solid #e9ecef; /* Only bottom border */
-    padding: 15px 12px; /* More padding */
+    padding: 10.5px 8.4px; /* 15px,12px *0.7 */
     text-align: left;
-    font-size: 0.95rem;
+    font-size: 0.95rem; /* tetap rem */
     vertical-align: middle; /* Align text vertically in middle */
     word-wrap: break-word;
 }
@@ -478,16 +482,16 @@ form button:hover {
     font-weight: 700; /* Bolder headers */
     color: #495057;
     text-transform: uppercase; /* Uppercase headers */
-    letter-spacing: 0.5px;
+    letter-spacing: 0.35px; /* 0.5 *0.7 */
     /* Add border-radius to top corners of first and last th */
 }
 
 #scheduleTable th:first-child {
-    border-top-left-radius: 10px;
+    border-top-left-radius: 7px; /* 10 *0.7 */
 }
 
 #scheduleTable th:last-child {
-    border-top-right-radius: 10px;
+    border-top-right-radius: 7px; /* 10 *0.7 */
 }
 
 #scheduleTable tbody tr:last-child td {
@@ -495,11 +499,11 @@ form button:hover {
 }
 
 /* Atur lebar kolom tabel (adjust as needed) */
-#scheduleTable th:nth-child(1), #scheduleTable td:nth-child(1) { width: 130px; min-width: 130px; } /* Waktu */
-#scheduleTable th:nth-child(2), #scheduleTable td:nth-child(2) { width: 160px; min-width: 160px; } /* Nomor Tujuan */
-#scheduleTable th:nth-child(3), #scheduleTable td:nth-child(3) { width: auto; min-width: 250px; white-space: normal; } /* Pesan */
-#scheduleTable th:nth-child(4), #scheduleTable td:nth-child(4) { width: 90px; min-width: 90px; text-align: center;} /* File */
-#scheduleTable th:nth-child(5), #scheduleTable td:nth-child(5) { width: 100px; min-width: 100px; text-align: center; } /* Status */
+#scheduleTable th:nth-child(1), #scheduleTable td:nth-child(1) { width: 91px; min-width: 91px; } /* 130 *0.7 ≈91 */
+#scheduleTable th:nth-child(2), #scheduleTable td:nth-child(2) { width: 112px; min-width: 112px; } /* 160 *0.7 ≈112 */
+#scheduleTable th:nth-child(3), #scheduleTable td:nth-child(3) { width: auto; min-width: 175px; white-space: normal; } /* 250 *0.7 */
+#scheduleTable th:nth-child(4), #scheduleTable td:nth-child(4) { width: 63px; min-width: 63px; text-align: center;} /* 90 *0.7 */
+#scheduleTable th:nth-child(5), #scheduleTable td:nth-child(5) { width: 70px; min-width: 70px; text-align: center; } /* 100 *0.7 */
 #scheduleTable th:nth-child(6), #scheduleTable td:nth-child(6) { text-align: center; vertical-align: middle !important;}
 #scheduleTable td.action-buttons {
     text-align: center;
@@ -518,8 +522,8 @@ form button:hover {
 
 .material-icons {
     vertical-align: middle;
-    margin-right: 3px;
-    font-size: 18px; /* Standard icon size */
+    margin-right: 2.1px; /* 3 *0.7 */
+    font-size: 12.6px; /* 18 *0.7 */
 }
 
 /* --- TAMBAHAN: Paksa tombol tertentu ke baris baru (Efek <br>) --- */
@@ -527,86 +531,87 @@ form button:hover {
 .action-buttons .delete-meeting-btn,
 .action-buttons .delete-history-btn {
     flex-basis: 100%; /* Paksa elemen ini untuk mengambil lebar penuh dari wadahnya */
-    margin-top: 8px; /* Opsional: Beri sedikit jarak atas dari baris sebelumnya */
+    margin-top: 5.6px; /* 8 *0.7 */
 }
 
 .action-buttons button {
     min-width: 0;
-    padding: 10px 15px; /* More padding for buttons */
+    padding: 7px 10.5px; /* 10px,15px *0.7 */
     cursor: pointer;
-    border-radius: 6px; /* Slightly more rounded buttons */
-    font-size: 0.85rem; /* Slightly smaller font for compactness */
+    border-radius: 4.2px; /* 6 *0.7 */
+    font-size: 0.85rem; /* tetap rem */
     font-weight: 600;
     border: none;
     transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 3.5px; /* 5 *0.7 */
     white-space: nowrap;
 }
 
 .edit-btn {
     background-color: #007bff; /* Primary blue */
     color: white;
-    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+    box-shadow: 0 1.4px 3.5px rgba(0, 123, 255, 0.2);
 }
 .edit-btn:hover {
     background-color: #0056b3;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    transform: translateY(-0.7px); /* -1px *0.7 */
+    box-shadow: 0 2.8px 5.6px rgba(0, 123, 255, 0.3);
 }
 
 .cancel-btn,
 .delete-history-btn {
     background-color: #dc3545; /* Red for danger */
     color: white;
-    box-shadow: 0 2px 5px rgba(220, 53, 69, 0.2);
+    box-shadow: 0 1.4px 3.5px rgba(220, 53, 69, 0.2);
 }
 .cancel-btn:hover,
 .delete-history-btn:hover {
     background-color: #c82333;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    transform: translateY(-0.7px);
+    box-shadow: 0 2.8px 5.6px rgba(220, 53, 69, 0.3);
 }
 
 /* --- AWAL PENAMBAHAN CSS UNTUK TOMBOL RAPAT --- */
 .cancel-meeting-btn {
     background-color: #ffc107; /* Orange/Yellow for warning/cancel */
     color: #212529; /* Dark text for better contrast */
-    box-shadow: 0 2px 5px rgba(255, 193, 7, 0.2);
+    box-shadow: 0 1.4px 3.5px rgba(255, 193, 7, 0.2);
 }
 .cancel-meeting-btn:hover {
     background-color: #e0a800;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+    transform: translateY(-0.7px);
+    box-shadow: 0 2.8px 5.6px rgba(255, 193, 7, 0.3);
 }
 
 .finish-meeting-btn {
     background-color: #28a745; /* Green for success/finish */
     color: white;
-    box-shadow: 0 2px 5px rgba(40, 167, 69, 0.2);
+    box-shadow: 0 1.4px 3.5px rgba(40, 167, 69, 0.2);
 }
 .finish-meeting-btn:hover {
     background-color: #218838;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    transform: translateY(-0.7px);
+    box-shadow: 0 2.8px 5.6px rgba(40, 167, 69, 0.3);
 }
 
 .delete-meeting-btn {
     background-color: #6c757d; /* Grey for delete history */
     color: white;
-    box-shadow: 0 2px 5px rgba(108, 117, 125, 0.2);
+    box-shadow: 0 1.4px 3.5px rgba(108, 117, 125, 0.2);
 }
 .delete-meeting-btn:hover {
     background-color: #5a6268;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+    transform: translateY(-0.7px);
+    box-shadow: 0 2.8px 5.6px rgba(108, 117, 125, 0.3);
 }
 
+/* Duplicate .form-container block from your original file - scaled to 70% */
 .form-container {
-  flex: 0 0 500px; /* lebar kiri tetap */
-  max-width: 500px;
+  flex: 0 0 350px; /* 500 * 0.7 */
+  max-width: 350px;
 }
 
 .content-area {
@@ -616,16 +621,15 @@ form button:hover {
 }
 /* --- AKHIR PENAMBAHAN CSS --- */
 
-
 /* ---- Footer ---- */
 footer {
     background-color: #003366;
     color: white;
     text-align: center;
-    padding: 20px 20px; /* More padding */
+    padding: 14px 14px; /* 20 *0.7 */
     margin-top: auto;
-    font-size: 0.9rem;
-    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 0.9rem; /* tetap rem */
+    box-shadow: 0 -1.4px 2.8px rgba(0, 0, 0, 0.1);
 }
 
 /* ======================================= */
@@ -637,20 +641,20 @@ footer {
 #import-form {
     background-color: #f0f4f8; /* Warna latar sedikit berbeda untuk memisahkan bagian */
     border: 1px solid #dcdcdc;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 2.5em; /* Jarak antar form */
+    padding: 17.5px; /* 25 *0.7 */
+    border-radius: 8.4px; /* 12 *0.7 */
+    margin-bottom: 1.75em; /* 2.5em *0.7 */
 }
 
 /* Memberi gaya pada judul di dalam form (Tambah/Edit dan Import) */
 #contact-crud-form h3,
 #import-form h3 {
     margin-top: 0;
-    font-size: 1.4rem;
+    font-size: 1.4rem; /* tetap rem */
     color: #003366;
     border-bottom: 2px solid #007bff;
-    padding-bottom: 12px;
-    margin-bottom: 25px;
+    padding-bottom: 8.4px; /* 12 *0.7 */
+    margin-bottom: 17.5px; /* 25 *0.7 */
 }
 
 /* Tabel untuk daftar kontak */
@@ -659,13 +663,13 @@ footer {
     border-collapse: separate; /* Gunakan separate agar border-radius berfungsi */
     border-spacing: 0;
     margin-top: 1em;
-    font-size: 1rem;
+    font-size: 1rem; /* tetap rem */
 }
 
 /* Header dan sel pada tabel */
 #contact-management-table th,
 #contact-management-table td {
-    padding: 14px 18px; /* Padding lebih besar untuk kenyamanan membaca */
+    padding: 9.8px 12.6px; /* 14px,18px *0.7 */
     border-bottom: 1px solid #e0e0e0;
     text-align: left;
     vertical-align: middle;
@@ -683,7 +687,7 @@ footer {
     font-weight: 700;
     color: #495057;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.35px; /* 0.5 *0.7 */
 }
 
 /* Efek "Zebra" pada baris tabel agar mudah dibaca */
@@ -698,25 +702,24 @@ footer {
 
 /* Penataan untuk kolom Aksi agar tombolnya rapi */
 #contact-management-table td.action-buttons {
-    width: 130px; /* Memberi lebar tetap agar tombol tidak berantakan */
+    width: 91px; /* 130 *0.7 */
     text-align: center;
 }
 
 /* Tombol Aksi di dalam tabel (Edit & Hapus) */
 #contact-management-table .action-buttons .edit-btn,
 #contact-management-table .action-buttons .cancel-btn {
-    /* Menggunakan gaya tombol yang sudah ada, hanya menyesuaikan ukuran */
-    padding: 6px 12px;
-    margin: 0 4px;
-    font-size: 0.85rem;
+    padding: 4.2px 8.4px; /* 6px,12px *0.7 */
+    margin: 0 2.8px; /* 4px *0.7 */
+    font-size: 0.85rem; /* tetap rem */
 }
 
 /* ---- Responsive Design ---- */
 @media (max-width: 1024px) {
     .main-content {
         flex-direction: column;
-        padding: 15px;
-        gap: 30px; /* Increased gap in column layout */
+        padding: 10.5px; /* 15 *0.7 */
+        gap: 21px; /* 30 *0.7 */
         max-width: 90%; /* Adjust max-width for tablets */
     }
     .form-container,
@@ -726,53 +729,53 @@ footer {
         max-height: none;
         overflow-y: visible;
         flex-basis: auto;
-        padding: 25px; /* Slightly less padding */
+        padding: 17.5px; /* 25 *0.7 */
     }
     .table-wrapper {
-        max-height: 60vh; /* Allow table to take more height */
+        max-height: 42vh; /* 60vh *0.7 */
     }
     .navbar-left img {
-        margin-left: 20px; /* Adjust for smaller screens */
-        width: 70px;
-        height: 50px;
+        margin-left: 14px; /* 20 *0.7 */
+        width: 49px; /* 70 *0.7 */
+        height: 35px; /* 50 *0.7 */
     }
     .navbar-text {
-        font-size: 20px;
+        font-size: 14px; /* 20 *0.7 */
     }
 }
 
 @media (max-width: 768px) {
     .app-header h1 {
-        font-size: 2rem;
+        font-size: 2rem; /* tetap rem value from original */
     }
     .navbar {
-        height: 60px;
-        padding: 8px 15px;
+        height: 42px; /* 60 *0.7 */
+        padding: 5.6px 10.5px; /* 8px,15px *0.7 */
     }
     .navbar-left img {
-        margin-left: 10px;
-        width: 60px;
-        height: 45px;
+        margin-left: 7px; /* 10 *0.7 */
+        width: 42px; /* 60 *0.7 */
+        height: 31.5px; /* 45 *0.7 (decimal is ok) */
     }
     .navbar-text {
-        font-size: 18px;
+        font-size: 18px; /* original rem-based decision */
     }
     .form-container h2,
     .schedule-container h2 {
-        font-size: 1.6rem;
+        font-size: 1.6rem; /* remain rem-based */
     }
     .filter-buttons {
-        gap: 8px; /* Reduce gap for smaller screens */
+        gap: 5.6px; /* 8 *0.7 */
         justify-content: space-around; /* Distribute buttons evenly */
     }
     .filter-button {
-        padding: 8px 15px;
+        padding: 5.6px 10.5px; /* 8px,15px *0.7 */
         font-size: 0.9rem;
-        max-width: 120px;
+        max-width: 84px; /* 120 *0.7 */
     }
     #scheduleTable th,
     #scheduleTable td {
-        padding: 10px 8px; /* Reduce table padding */
+        padding: 7px 5.6px; /* 10px,8px *0.7 */
         font-size: 0.85rem;
     }
     .action-buttons {
@@ -781,58 +784,58 @@ footer {
     }
     .action-buttons button {
         width: 100%; /* Make buttons take full width of the cell */
-        padding: 8px 10px;
+        padding: 5.6px 7px; /* 8px,10px *0.7 */
         font-size: 0.75rem;
-        gap: 3px;
+        gap: 2.1px;
     }
     .material-icons {
-        font-size: 16px;
+        font-size: 11.2px; /* 16 *0.7 */
     }
 }
 
 @media (max-width: 480px) {
     .navbar {
-        height: 50px;
+        height: 35px; /* 50 *0.7 */
     }
     .navbar-left img {
-        margin-left: 5px;
-        width: 50px;
-        height: 35px;
-        margin-right: 8px;
+        margin-left: 3.5px; /* 5 *0.7 */
+        width: 35px; /* 50 *0.7 */
+        height: 24.5px; /* 35 *0.7 */
+        margin-right: 5.6px; /* 8 *0.7 */
     }
     .navbar-text {
-        font-size: 16px;
+        font-size: 11.2px; /* 16 *0.7; decimal ok */
         text-align: right; /* Allow text to be closer to logo */
     }
     .app-header h1 {
-        font-size: 1.8rem;
+        font-size: 1.8rem; /* remain rem-based */
     }
     .main-content {
-        padding: 10px;
-        gap: 20px;
+        padding: 7px; /* 10 *0.7 */
+        gap: 14px; /* 20 *0.7 */
     }
     .form-container,
     .schedule-container {
-        padding: 20px;
+        padding: 14px; /* 20 *0.7 */
     }
     form input, form textarea, form button {
         font-size: 0.9rem;
-        padding: 10px 12px;
+        padding: 7px 8.4px; /* 10 *0.7 and 12 *0.7 */
     }
     .contact-checklist-box label {
         font-size: 0.85rem;
-        padding: 6px 8px;
+        padding: 4.2px 5.6px; /* 6px,8px *0.7 */
     }
     .contact-checklist-box input[type="checkbox"], .select-all-container input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
+        width: 11.2px; /* 16 *0.7 */
+        height: 11.2px;
     }
     .contact-checklist-box input[type="checkbox"]:checked::after, .select-all-container input[type="checkbox"]:checked::after {
-        font-size: 12px;
-        line-height: 16px;
+        font-size: 8.4px; /* 12 *0.7 */
+        line-height: 11.2px;
     }
     .file-upload-container {
-        padding: 12px;
+        padding: 8.4px; /* 12 *0.7 */
     }
     .file-upload-label {
         font-size: 0.9em;
@@ -840,7 +843,7 @@ footer {
     .filter-buttons {
         flex-direction: column; /* Stack filter buttons vertically */
         align-items: stretch; /* Stretch to full width */
-        gap: 10px;
+        gap: 7px; /* 10 *0.7 */
     }
     .filter-button {
         max-width: none; /* Remove max-width when stacked */
@@ -851,6 +854,6 @@ footer {
         overflow-x: scroll; /* Keep horizontal scroll */
     }
     #scheduleTable {
-        min-width: 600px; /* Minimum width for table on small screens */
+        min-width: 420px; /* 600 *0.7 */
     }
 }
