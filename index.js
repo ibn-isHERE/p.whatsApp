@@ -29,6 +29,7 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static("public"));
+<<<<<<< HEAD
 
 const mediaDir = path.join(__dirname, 'media');
 if (!fs.existsSync(mediaDir)) {
@@ -36,6 +37,17 @@ if (!fs.existsSync(mediaDir)) {
 }
 app.use('/media', express.static(mediaDir));
 
+=======
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
+const mediaDir = path.join(__dirname, 'media');
+if (!fs.existsSync(mediaDir)) {
+    fs.mkdirSync(mediaDir, { recursive: true });
+}
+app.use('/media', express.static(mediaDir));
+
+>>>>>>> c30fff9d07870d08fef454d3581482465002141b
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
