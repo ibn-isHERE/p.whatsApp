@@ -78,7 +78,7 @@ db.serialize(() => {
         }
     );
 
-    // 4. Tabel untuk chat/customer service (UPDATED)
+     // 4. Tabel untuk chat/customer service (UPDATED WITH MEDIA SUPPORT)
     db.run(
         `CREATE TABLE IF NOT EXISTS chats (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,8 +88,11 @@ db.serialize(() => {
             timestamp TEXT NOT NULL,
             messageType TEXT DEFAULT 'chat',
             mediaUrl TEXT,
+            mediaData TEXT,
             isRead BOOLEAN DEFAULT FALSE,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            status TEXT DEFAULT 'active',
+            session_id TEXT
         )`,
         (err) => {
             if (err) {
@@ -97,7 +100,7 @@ db.serialize(() => {
             } else {
                 console.log("Tabel 'chats' siap digunakan.");
                 
-                // Cek dan tambahkan kolom-kolom yang mungkin belum ada
+                // ✅ PERBAIKAN: Cek dan tambahkan kolom-kolom yang mungkin belum ada
                 db.all("PRAGMA table_info(chats)", (pragmaErr, columns) => {
                     if (pragmaErr) {
                         console.error("Error checking chats table structure:", pragmaErr);
@@ -113,9 +116,11 @@ db.serialize(() => {
                                 if (alterErr) {
                                     console.error(`Error adding ${columnName} column:`, alterErr);
                                 } else {
-                                    console.log(`Added ${columnName} column to chats table`);
+                                    console.log(`✅ Added ${columnName} column to chats table`);
                                 }
                             });
+                        } else {
+                            console.log(`✓ Column ${columnName} already exists`);
                         }
                     };
 
@@ -123,15 +128,16 @@ db.serialize(() => {
                     addColumnIfNotExists('messageType', "messageType TEXT DEFAULT 'chat'");
                     addColumnIfNotExists('isRead', "isRead BOOLEAN DEFAULT FALSE");
                     addColumnIfNotExists('created_at', "created_at TEXT DEFAULT CURRENT_TIMESTAMP");
-
-                    // ✅ PERBAIKAN UTAMA: Tambah kolom mediaUrl jika belum ada
                     addColumnIfNotExists('mediaUrl', "mediaUrl TEXT NULL");
+                    
+                    // ✅ PERBAIKAN UTAMA: Tambah kolom mediaData untuk menyimpan metadata media
+                    addColumnIfNotExists('mediaData', "mediaData TEXT NULL");
+                    addColumnIfNotExists('status', "status TEXT DEFAULT 'active'");
+                    addColumnIfNotExists('session_id', "session_id TEXT");
                 });
             }
         }
     );
-
-
     // 5. Buat index untuk performa yang lebih baik
     db.run("CREATE INDEX IF NOT EXISTS idx_chats_fromNumber ON chats(fromNumber)", (err) => {
         if (err) {
@@ -154,6 +160,15 @@ db.serialize(() => {
             console.error("Error creating direction_isRead index:", err);
         } else {
             console.log("Index pada direction dan isRead siap digunakan.");
+        }
+    });
+
+    
+    db.run("CREATE INDEX IF NOT EXISTS idx_chats_messageType ON chats(messageType)", (err) => {
+        if (err) {
+            console.error("Error creating messageType index:", err);
+        } else {
+            console.log("Index pada messageType siap digunakan.");
         }
     });
 });
